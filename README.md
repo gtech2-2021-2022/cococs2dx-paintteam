@@ -1,7 +1,7 @@
-# cocos2dx
+# Projet 5 : C++ / Cocos2dx
 
 Groupe: 
 
-- Nom Prenom
-- Nom Prenom
-- Nom Prenom
+- Cheron Lilian
+- Taurand Hugo
+
