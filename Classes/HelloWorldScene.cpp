@@ -101,7 +101,7 @@ bool HelloWorld::init()
         this->addChild(label, 1);
     }*/
 
-    // add "HelloWorld" splash screen"
+    // add "Map" splash screen"
     auto sprite = Sprite::create("Map3.png");
     if (sprite == nullptr)
     {
