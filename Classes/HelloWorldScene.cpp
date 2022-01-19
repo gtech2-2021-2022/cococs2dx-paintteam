@@ -83,24 +83,6 @@ bool HelloWorld::init()
     /////////////////////////////
     // 3. add your codes below...
 
-    // add a label shows "Hello World"
-    // create and initialize a label
-
-    /*auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    if (label == nullptr)
-    {
-        problemLoading("'fonts/Marker Felt.ttf'");
-    }
-    else
-    {
-        // position the label on the center of the screen
-        label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                                origin.y + visibleSize.height - label->getContentSize().height));
-
-        // add the label as a child to this layer
-        this->addChild(label, 1);
-    }*/
-
     // add "Map" splash screen"
     auto sprite = Sprite::create("Map3.png");
     if (sprite == nullptr)
@@ -115,6 +97,32 @@ bool HelloWorld::init()
         // add the sprite as a child to this layer
         this->addChild(sprite, 0);
     }
+
+    //add Character
+    auto chara = Sprite::create("characters.png");
+    if (chara == nullptr)
+    {
+        problemLoading("'characters.png'");
+    }
+    else
+    {
+        chara->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+        this->addChild(chara, 0);
+    }
+
+    //Move character on click
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan = [=](Touch* touch, Event* event) {
+        Vec2 pos;
+        pos = touch->getLocation();
+        auto move = MoveTo::create(2, pos);
+        if (chara->getNumberOfRunningActions() == 0) {
+            chara->runAction(move);
+        }
+        return true;
+    };
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
     return true;
 }
 
@@ -131,3 +139,4 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 
 }
+
