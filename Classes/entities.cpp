@@ -60,9 +60,9 @@ void Player::setArmor(Armor* armor)
     };
 }
 
-void Player::setPlayerSprite(string path, cocos2d::Vec2 size)
+void Player::setPlayerSprite(string path, Rect size)
 {
-    playerSprite = Sprite::create(path);
+    playerSprite = Sprite::create(path, size);
 }
 
 cocos2d::Sprite* Player::getPlayerSprite()
@@ -103,5 +103,15 @@ void Monster::receiveDammage(int nbDammage)
     {
         life = 0; //On met la vie à 0 (mort)
     }
+}
+
+void Monster::setMonsterSprite(string path, Rect size)
+{
+    monsterSprite = Sprite::create(path, size);
+}
+
+cocos2d::Sprite* Monster::getMonsterSprite()
+{
+    return monsterSprite;
 }
 

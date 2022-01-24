@@ -24,6 +24,7 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "entities.h"
 
 USING_NS_CC;
 
@@ -83,7 +84,7 @@ bool HelloWorld::init()
     /////////////////////////////
     // 3. add your codes below...
 
-    // add "Map" splash screen"
+    //Add map
     auto sprite = Sprite::create("Map3.png");
     if (sprite == nullptr)
     {
@@ -98,16 +99,19 @@ bool HelloWorld::init()
         this->addChild(sprite, 0);
     }
 
-    //add Character
-    auto chara = Sprite::create("characters.png");
-    if (chara == nullptr)
+    //Add character
+    Player player;
+    player.setPlayerSprite("player.png", Rect(0, 0, 20, 20));
+    auto _player = player.getPlayerSprite();
+    _player->setScale(2,2);
+    if (_player == nullptr)
     {
-        problemLoading("'characters.png'");
+        problemLoading("'player.png'");
     }
     else
     {
-        chara->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-        this->addChild(chara, 0);
+        _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+        this->addChild(_player, 0);
     }
 
     //Move character on click
@@ -115,9 +119,13 @@ bool HelloWorld::init()
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
         Vec2 pos;
         pos = touch->getLocation();
-        auto move = MoveTo::create(2, pos);
-        if (chara->getNumberOfRunningActions() == 0) {
-            chara->runAction(move);
+        auto move = MoveTo::create(3, pos);
+        if (_player->getNumberOfRunningActions() == 0) {
+            _player->runAction(move);
+        }
+        else if (_player->getNumberOfRunningActions() != 0) {
+            _player->stopAllActions();
+            _player->runAction(move);
         }
         return true;
     };

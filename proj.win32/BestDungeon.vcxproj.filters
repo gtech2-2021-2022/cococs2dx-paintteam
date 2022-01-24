@@ -27,6 +27,18 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\entities.cpp">
+      <Filter>src\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\item.cpp">
+      <Filter>src\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\map.cpp">
+      <Filter>src\source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Utils.cpp">
+      <Filter>src\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -36,6 +48,18 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\AppDelegate.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\entities.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\item.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\map.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Utils.h">
       <Filter>src\header</Filter>
     </ClInclude>
   </ItemGroup>
