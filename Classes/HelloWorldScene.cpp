@@ -53,7 +53,7 @@ bool HelloWorld::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
+    /*/////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
 
@@ -81,8 +81,7 @@ bool HelloWorld::init()
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
 
-    /////////////////////////////
-    // 3. add your codes below...
+    /////////////////////////////*/
 
     //Add map
     auto sprite = Sprite::create("Map3.png");
@@ -101,12 +100,12 @@ bool HelloWorld::init()
 
     //Add character
     Player player;
-    player.setPlayerSprite("player.png", Rect(0, 0, 20, 20));
+    player.setPlayerSprite("player/player.png", Rect(0, 0, 20, 20));
     auto _player = player.getPlayerSprite();
     _player->setScale(2,2);
     if (_player == nullptr)
     {
-        problemLoading("'player.png'");
+        problemLoading("'player/player.png'");
     }
     else
     {

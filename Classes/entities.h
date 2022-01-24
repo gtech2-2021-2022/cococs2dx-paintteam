@@ -32,10 +32,10 @@ public:
 	void setName(std::string playerName) { _name = playerName; };
 	void setGold(int newGold) { gold = gold + newGold; };
 	int getGold() { return gold; };
-	//void setPlayerY(int _playerY) { playerY = _playerY; };
-	//void setPlayerX(int _playerX) { playerX = _playerX; };
-	//int getPlayerY() { return playerY; };
-	//int getPlayerX() { return playerX; };
+	void setPlayerY(int _playerY) { playerY = _playerY; };
+	void setPlayerX(int _playerX) { playerX = _playerX; };
+	int getPlayerY() { return playerY; };
+	int getPlayerX() { return playerX; };
 	void setPlayerSprite(std::string path, cocos2d::Rect size);
 	cocos2d::Sprite* getPlayerSprite();
 
@@ -48,8 +48,8 @@ protected:
 	Armor* _chestplate = nullptr;
 	Armor* _legging = nullptr;
 	Armor* _boots = nullptr;
-	//int playerX = 0;
-	//int playerY = 0;
+	int playerX = 0;
+	int playerY = 0;
 	cocos2d::Sprite* playerSprite = nullptr;
 	
 };

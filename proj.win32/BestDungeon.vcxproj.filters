@@ -39,6 +39,9 @@
     <ClCompile Include="..\Classes\Utils.cpp">
       <Filter>src\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\MainMenuScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Utils.h">
       <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MainMenuScene.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
