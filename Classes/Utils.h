@@ -9,7 +9,7 @@ class Utils
 {
 	
 	public:
-		cocos2d::Animation* createAnimation(std::string file, int size, int frames);
+		void createAnimation();
 
 };
 

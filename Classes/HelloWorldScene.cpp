@@ -25,6 +25,7 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
 #include "entities.h"
+#include "Utils.h"
 
 USING_NS_CC;
 
@@ -50,6 +51,7 @@ bool HelloWorld::init()
         return false;
     }
 
+    Director::getInstance()->setContentScaleFactor(1);
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -115,20 +117,30 @@ bool HelloWorld::init()
 
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
+    const int movementTag = 1;
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
         Vec2 pos;
         pos = touch->getLocation();
         auto move = MoveTo::create(3, pos);
+        move->setTag(movementTag);
         if (_player->getNumberOfRunningActions() == 0) {
             _player->runAction(move);
         }
         else if (_player->getNumberOfRunningActions() != 0) {
-            _player->stopAllActions();
+            _player->stopActionByTag(movementTag);
             _player->runAction(move);
         }
         return true;
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+    //Animation of the character
+    Utils utils;
+    utils.createAnimation();
+    auto anim = AnimationCache::getInstance()->getAnimation("idleAnimation");
+    auto sf = anim->getFrames().at(0)->getSpriteFrame();
+    auto action = Animate::create(anim);
+    _player->runAction(RepeatForever::create(action));
 
     return true;
 }
