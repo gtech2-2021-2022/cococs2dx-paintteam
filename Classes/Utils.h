@@ -10,7 +10,7 @@ class Utils
 	
 	public:
 		void createAnimation();
-
+		cocos2d::Sprite* createSprite(const char* fileName);
 };
 
 //#endif

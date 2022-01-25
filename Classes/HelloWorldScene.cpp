@@ -86,19 +86,27 @@ bool HelloWorld::init()
     /////////////////////////////*/
 
     //Add map
-    auto sprite = Sprite::create("Map3.png");
-    if (sprite == nullptr)
-    {
-        problemLoading("'Map3.png'");
-    }
-    else
-    {
-        // position the sprite on the center of the screen
-        sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+  
+    _tileMap = CCTMXTiledMap::create("Texture/TestRoom.tmx");
+    // _tileMap->initWithTMXFile("Texture/TestRoom.tmx");
 
-        // add the sprite as a child to this layer
-        this->addChild(sprite, 0);
-    }
+    /* 
+    Doors
+    Collisions
+    Doors
+    Grass
+    Rocks
+    Wall2
+    Wall
+    Ground2
+    Ground
+    */
+
+    _collisions = _tileMap->layerNamed("Collisions");
+    _collisions->setVisible(false);
+
+
+    this->addChild(_tileMap);
 
     //Add character
     Player player;

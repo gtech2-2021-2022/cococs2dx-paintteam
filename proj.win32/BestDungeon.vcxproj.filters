@@ -42,6 +42,7 @@
     <ClCompile Include="..\Classes\MainMenuScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="MasterRoom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -68,6 +69,7 @@
     <ClInclude Include="..\Classes\MainMenuScene.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="MasterRoom.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
