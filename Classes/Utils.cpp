@@ -10,6 +10,12 @@ void Utils::createAnimation() {
 	}
 	idleAnimation->setDelayPerUnit(0.2);
 	AnimationCache::getInstance()->addAnimation(idleAnimation, "idleAnimation");
+	for (int i = 0; i < 24; i++)
+	{
+		idleAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 32, 32, 32)));
+	}
+	idleAnimation->setDelayPerUnit(0.03);
+	AnimationCache::getInstance()->addAnimation(idleAnimation, "walkAnimation");
 }
 
 static void problemLoading(const char* filename)

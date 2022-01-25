@@ -145,7 +145,7 @@ bool HelloWorld::init()
     //Animation of the character
     Utils utils;
     utils.createAnimation();
-    auto anim = AnimationCache::getInstance()->getAnimation("idleAnimation");
+    auto anim = AnimationCache::getInstance()->getAnimation("walkAnimation");
     auto sf = anim->getFrames().at(0)->getSpriteFrame();
     auto action = Animate::create(anim);
     _player->runAction(RepeatForever::create(action));
