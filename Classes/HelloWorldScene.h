@@ -26,10 +26,13 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "entities.h"
+
 
 class HelloWorld : public cocos2d::Scene
 {
 private:
+    Player player;
     cocos2d::CCTMXTiledMap* _tileMap;
     cocos2d::CCTMXLayer* _collisions;
 

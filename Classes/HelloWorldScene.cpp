@@ -111,7 +111,7 @@ bool HelloWorld::init()
     this->addChild(_tileMap);
 
     //Add character
-    Player player;
+   
     player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
     if (_player == nullptr)
@@ -130,7 +130,7 @@ bool HelloWorld::init()
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
-    listener->onTouchBegan = [=, &player](Touch* touch, Event* event) {
+    listener->onTouchBegan = [=](Touch* touch, Event* event) {
         Vec2 pos;
         pos = touch->getLocation();
         Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
@@ -151,7 +151,7 @@ bool HelloWorld::init()
         log("%d", player.getDirection());
         player.updateAnimation(_player, player.getDirection());
         auto move = MoveTo::create(3, pos);
-        auto test = [=, &player]() {
+        auto test = [=]() {
             _player->stopAllActions();
             Animation* anim;
             log("%d", player.getDirection());
