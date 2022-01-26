@@ -26,6 +26,8 @@
 #include "SimpleAudioEngine.h"
 #include "entities.h"
 #include "Utils.h"
+#include <math.h>
+#define PI           3.14159265358979323846  /* possiblement */
 
 USING_NS_CC;
 
@@ -110,9 +112,8 @@ bool HelloWorld::init()
 
     //Add character
     Player player;
-    player.setPlayerSprite("player/player.png", Rect(0, 0, 20, 20));
+    player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
-    _player->setScale(2,2);
     if (_player == nullptr)
     {
         problemLoading("'player/player.png'");
@@ -126,9 +127,31 @@ bool HelloWorld::init()
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
-    listener->onTouchBegan = [=](Touch* touch, Event* event) {
+    listener->onTouchBegan = [=, &player](Touch* touch, Event* event) {
         Vec2 pos;
         pos = touch->getLocation();
+        Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
+        float angle = vector.getAngle() * 180 / PI;
+        log("%f", angle);
+        if (angle > -135 && angle < -45)
+        {
+            player.setDirection(UP);
+            player.setExDirection(UP);
+        } else if (angle > -45 && angle < 45)
+        {
+            player.setDirection(LEFT);
+            player.setExDirection(LEFT);
+        } else if (angle > 45 && angle < 135)
+        {
+            player.setDirection(DOWN);
+            player.setExDirection(DOWN);
+        } else
+        {
+            log("else");
+            player.setDirection(RIGHT);
+            player.setExDirection(RIGHT);
+        }
+        player.updateAnimation(_player, player.getDirection());
         auto move = MoveTo::create(3, pos);
         move->setTag(movementTag);
         if (_player->getNumberOfRunningActions() == 0) {
@@ -143,12 +166,7 @@ bool HelloWorld::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     //Animation of the character
-    Utils utils;
-    utils.createAnimation();
-    auto anim = AnimationCache::getInstance()->getAnimation("walkDownAnimation");
-    auto sf = anim->getFrames().at(0)->getSpriteFrame();
-    auto action = Animate::create(anim);
-    _player->runAction(RepeatForever::create(action));
+    player.createAnimation();
 
     return true;
 }

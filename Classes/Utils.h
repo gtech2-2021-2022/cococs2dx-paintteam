@@ -5,11 +5,11 @@
 #include "cocos2d.h"
 #include <iostream>
 
+
 class Utils
 {
 	
 	public:
-		void createAnimation();
 		cocos2d::Sprite* createSprite(const char* fileName);
 };
 

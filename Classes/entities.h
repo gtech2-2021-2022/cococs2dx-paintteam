@@ -8,6 +8,8 @@
 
 class Map;
 
+enum Direction {UP, DOWN, LEFT, RIGHT};
+
 class Player
 {
 public:
@@ -38,6 +40,12 @@ public:
 	int getPlayerX() { return playerX; };
 	void setPlayerSprite(std::string path, cocos2d::Rect size);
 	cocos2d::Sprite* getPlayerSprite();
+	void createAnimation();
+	void updateAnimation(cocos2d::Sprite* _player, enum Direction direction);
+	void setDirection(Direction _direction) { direction = _direction;  };
+	Direction getDirection() { return direction;  };
+	void setExDirection(Direction _exDirection) { exDirection = _exDirection;  };
+	Direction getExDirection() { return exDirection;  };
 
 protected:
 	std::string _name;
@@ -51,6 +59,8 @@ protected:
 	int playerX = 0;
 	int playerY = 0;
 	cocos2d::Sprite* playerSprite = nullptr;
+	Direction direction;
+	Direction exDirection = DOWN;
 	
 };
 

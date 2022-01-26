@@ -70,6 +70,63 @@ cocos2d::Sprite* Player::getPlayerSprite()
     return playerSprite;
 }
 
+void Player::createAnimation() {
+    Animation* walkUpAnimation = Animation::create();
+    for (int i = 1; i < 3; i++)
+    {
+        walkUpAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 32, 32, 32)));
+    }
+    walkUpAnimation->setDelayPerUnit(0.25);
+    AnimationCache::getInstance()->addAnimation(walkUpAnimation, "walkUpAnimation");
+
+    Animation* walkDownAnimation = Animation::create();
+    for (int i = 1; i < 3; i++)
+    {
+        walkDownAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 0, 32, 32)));
+    }
+    walkDownAnimation->setDelayPerUnit(0.25);
+    AnimationCache::getInstance()->addAnimation(walkDownAnimation, "walkDownAnimation");
+
+    Animation* walkLeftAnimation = Animation::create();
+    for (int i = 1; i < 3; i++)
+    {
+        walkLeftAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 64, 32, 32)));
+    }
+    walkLeftAnimation->setDelayPerUnit(0.25);
+    AnimationCache::getInstance()->addAnimation(walkLeftAnimation, "walkLeftAnimation");
+
+    Animation* walkRightAnimation = Animation::create();
+    for (int i = 1; i < 3; i++)
+    {
+        walkRightAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 96, 32, 32)));
+    }
+    walkRightAnimation->setDelayPerUnit(0.25);
+    AnimationCache::getInstance()->addAnimation(walkRightAnimation, "walkRightAnimation");
+}
+
+void Player::updateAnimation(Sprite* _player, Direction direction) {
+    _player->stopAllActions();
+    Animation* anim;
+    switch (direction)
+    {
+    case Direction::UP: {
+        anim = AnimationCache::getInstance()->getAnimation("walkUpAnimation");
+        break; }
+    case Direction::DOWN: {
+        anim = AnimationCache::getInstance()->getAnimation("walkDownAnimation");
+        break; }
+    case Direction::LEFT: {
+        anim = AnimationCache::getInstance()->getAnimation("walkLeftAnimation");
+        break; }
+    case Direction::RIGHT: {
+        anim = AnimationCache::getInstance()->getAnimation("walkRightAnimation");
+        break; }
+    }
+    auto sf = anim->getFrames().at(0)->getSpriteFrame();
+    auto action = Animate::create(anim);
+    _player->runAction(RepeatForever::create(action));
+}
+
 Monster::Monster()
 {   
     int random;
