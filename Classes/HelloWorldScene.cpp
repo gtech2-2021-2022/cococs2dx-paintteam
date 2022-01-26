@@ -124,6 +124,9 @@ bool HelloWorld::init()
         this->addChild(_player, 0);
     }
 
+    //Animation of the character
+    player.createAnimation();
+
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
@@ -132,41 +135,59 @@ bool HelloWorld::init()
         pos = touch->getLocation();
         Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
         float angle = vector.getAngle() * 180 / PI;
-        log("%f", angle);
         if (angle > -135 && angle < -45)
         {
             player.setDirection(UP);
-            player.setExDirection(UP);
         } else if (angle > -45 && angle < 45)
         {
             player.setDirection(LEFT);
-            player.setExDirection(LEFT);
         } else if (angle > 45 && angle < 135)
         {
             player.setDirection(DOWN);
-            player.setExDirection(DOWN);
         } else
         {
-            log("else");
             player.setDirection(RIGHT);
-            player.setExDirection(RIGHT);
         }
+        log("%d", player.getDirection());
         player.updateAnimation(_player, player.getDirection());
         auto move = MoveTo::create(3, pos);
+        auto test = [=, &player]() {
+            _player->stopAllActions();
+            Animation* anim;
+            log("%d", player.getDirection());
+            if (player.getDirection() == UP) {
+                anim = AnimationCache::getInstance()->getAnimation("idleUpAnimation");
+            }
+            else if (player.getDirection() == DOWN) {
+                anim = AnimationCache::getInstance()->getAnimation("idleDownAnimation");
+            }
+            else if (player.getDirection() == LEFT) {
+                anim = AnimationCache::getInstance()->getAnimation("idleLeftAnimation");
+            }
+            else {
+                anim = AnimationCache::getInstance()->getAnimation("idleRightAnimation");
+            }
+            log("%d", player.getDirection());
+            auto sf = anim->getFrames().at(0)->getSpriteFrame();
+            auto action = Animate::create(anim);
+            _player->runAction(RepeatForever::create(action));
+        };
+        log("%d", player.getDirection());
+        CallFunc* test2 = CallFunc::create(test);
         move->setTag(movementTag);
+        log("%d", player.getDirection());
+        Sequence* okmonbro = Sequence::create({move, test2});
         if (_player->getNumberOfRunningActions() == 0) {
-            _player->runAction(move);
+            _player->runAction(okmonbro);
         }
         else if (_player->getNumberOfRunningActions() != 0) {
             _player->stopActionByTag(movementTag);
-            _player->runAction(move);
+            _player->runAction(okmonbro);
         }
+        log("%d", player.getDirection());
         return true;
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-    //Animation of the character
-    player.createAnimation();
 
     return true;
 }
@@ -184,4 +205,3 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 
 }
-

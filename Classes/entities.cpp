@@ -102,6 +102,23 @@ void Player::createAnimation() {
     }
     walkRightAnimation->setDelayPerUnit(0.25);
     AnimationCache::getInstance()->addAnimation(walkRightAnimation, "walkRightAnimation");
+
+    Animation* idleUpAnimation = Animation::create();
+    idleUpAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 32, 32, 32)));
+    AnimationCache::getInstance()->addAnimation(idleUpAnimation, "idleUpAnimation");
+
+    Animation* idleDownAnimation = Animation::create();
+    idleDownAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 0, 32, 32)));
+    AnimationCache::getInstance()->addAnimation(idleDownAnimation, "idleDownAnimation");
+
+    Animation* idleLeftAnimation = Animation::create();
+    idleLeftAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 64, 32, 32)));
+    AnimationCache::getInstance()->addAnimation(idleLeftAnimation, "idleLeftAnimation");
+
+    Animation* idleRightAnimation = Animation::create();
+    idleRightAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 96, 32, 32)));
+    AnimationCache::getInstance()->addAnimation(idleRightAnimation, "idleRightAnimation");
+
 }
 
 void Player::updateAnimation(Sprite* _player, Direction direction) {
