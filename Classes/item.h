@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include "cocos2d.h"
 
 class Monster;
 
@@ -50,8 +51,14 @@ class Treasure
 public:
     Treasure() { goldNumber = rand() % 6; }
     int getGoldNumber() { return goldNumber; }
+    void setTreasureSprite(std::string path, cocos2d::Rect size) { treasureSprite = cocos2d::Sprite::create(path, size); };
+    cocos2d::Sprite* getTreasureSprite() { return treasureSprite; };
+    bool isOpen() { return open; };
+    void setOpen(bool _open) { open = _open; };
 
 protected:
     std::string name = "Treasure";
     int goldNumber;
+    cocos2d::Sprite* treasureSprite = nullptr;
+    bool open = false;
 };

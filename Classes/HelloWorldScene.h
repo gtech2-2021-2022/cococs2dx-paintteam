@@ -27,12 +27,14 @@
 
 #include "cocos2d.h"
 #include "entities.h"
+#include "item.h"
 
 
 class HelloWorld : public cocos2d::Scene
 {
 private:
     Player player;
+    Treasure pokeball;
     cocos2d::CCTMXTiledMap* _tileMap;
     cocos2d::CCTMXLayer* _collisions;
 
@@ -44,6 +46,7 @@ public:
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
+    void pickPockeball(cocos2d::Sprite* _pb);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);

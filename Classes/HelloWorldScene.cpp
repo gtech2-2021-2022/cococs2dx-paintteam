@@ -24,7 +24,6 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
-#include "entities.h"
 #include "Utils.h"
 #include <math.h>
 #define PI           3.14159265358979323846  /* possiblement */
@@ -111,7 +110,6 @@ bool HelloWorld::init()
     this->addChild(_tileMap);
 
     //Add character
-   
     player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
     if (_player == nullptr)
@@ -126,6 +124,36 @@ bool HelloWorld::init()
 
     //Animation of the character
     player.createAnimation();
+
+    //Add pokeball
+    pokeball.setTreasureSprite("player/pokeball.png", Rect(0, 0, 16, 24));
+    auto _pb = pokeball.getTreasureSprite();
+    if (_pb == nullptr)
+    {
+        problemLoading("'player/pokeball.png'");
+    }
+    else
+    {
+        _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
+        this->addChild(_pb, 0);
+    }
+
+    //Add pickButton
+    auto pickButton = MenuItemImage::create("pick.png", "pick.png", CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
+    if (pickButton == nullptr || pickButton->getContentSize().width <= 0 || pickButton->getContentSize().height <= 0) {
+        problemLoading("'pick.png'");
+    }
+    else {
+        float x = origin.x + visibleSize.width * 5.15;
+        float y = origin.y - visibleSize.height * 4;
+        pickButton->setPosition(Vec2(x, y));
+    }
+    auto menu = Menu::create(pickButton, NULL);
+    menu->setPosition(Vec2::ZERO);
+    menu->setScale(0.1, 0.1);
+    menu->setVisible(false);
+    this->addChild(menu, 1);
+
 
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
@@ -148,13 +176,11 @@ bool HelloWorld::init()
         {
             player.setDirection(RIGHT);
         }
-        log("%d", player.getDirection());
         player.updateAnimation(_player, player.getDirection());
         auto move = MoveTo::create(3, pos);
         auto test = [=]() {
             _player->stopAllActions();
             Animation* anim;
-            log("%d", player.getDirection());
             if (player.getDirection() == UP) {
                 anim = AnimationCache::getInstance()->getAnimation("idleUpAnimation");
             }
@@ -167,15 +193,18 @@ bool HelloWorld::init()
             else {
                 anim = AnimationCache::getInstance()->getAnimation("idleRightAnimation");
             }
-            log("%d", player.getDirection());
             auto sf = anim->getFrames().at(0)->getSpriteFrame();
             auto action = Animate::create(anim);
             _player->runAction(RepeatForever::create(action));
+            if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox())) {
+                menu->setVisible(true);
+            }
+            else {
+                menu->setVisible(false);
+            }
         };
-        log("%d", player.getDirection());
         CallFunc* test2 = CallFunc::create(test);
         move->setTag(movementTag);
-        log("%d", player.getDirection());
         Sequence* okmonbro = Sequence::create({move, test2});
         if (_player->getNumberOfRunningActions() == 0) {
             _player->runAction(okmonbro);
@@ -184,7 +213,6 @@ bool HelloWorld::init()
             _player->stopActionByTag(movementTag);
             _player->runAction(okmonbro);
         }
-        log("%d", player.getDirection());
         return true;
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
@@ -192,11 +220,27 @@ bool HelloWorld::init()
     return true;
 }
 
+void HelloWorld::pickPockeball(Sprite* _pb) {
+    log("ooooooooooo");
+    if (!pokeball.isOpen()) {
+        pokeball.setTreasureSprite("player/pokeball.png", Rect(32, 0, 16, 24));
+        auto _pb = pokeball.getTreasureSprite();
+        if (_pb == nullptr)
+        {
+            problemLoading("'player/pokeball.png'");
+        }
+        else
+        {
+            _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
+            this->addChild(_pb, 0);
+        }
+    }
+}
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
-    Director::getInstance()->end();
+    //Director::getInstance()->end();
 
     /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
 

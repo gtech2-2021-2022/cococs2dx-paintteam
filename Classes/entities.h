@@ -38,8 +38,8 @@ public:
 	void setPlayerX(int _playerX) { playerX = _playerX; };
 	int getPlayerY() { return playerY; };
 	int getPlayerX() { return playerX; };
-	void setPlayerSprite(std::string path, cocos2d::Rect size);
-	cocos2d::Sprite* getPlayerSprite();
+	void setPlayerSprite(std::string path, cocos2d::Rect size) { playerSprite = cocos2d::Sprite::create(path, size); };
+	cocos2d::Sprite* getPlayerSprite() { return playerSprite; };
 	void createAnimation();
 	void updateAnimation(cocos2d::Sprite* _player, enum Direction direction);
 	void setDirection(Direction _direction) { direction = _direction;  };

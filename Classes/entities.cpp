@@ -60,16 +60,6 @@ void Player::setArmor(Armor* armor)
     };
 }
 
-void Player::setPlayerSprite(string path, Rect size)
-{
-    playerSprite = Sprite::create(path, size);
-}
-
-cocos2d::Sprite* Player::getPlayerSprite()
-{
-    return playerSprite;
-}
-
 void Player::createAnimation() {
     Animation* walkUpAnimation = Animation::create();
     for (int i = 1; i < 3; i++)
@@ -105,18 +95,22 @@ void Player::createAnimation() {
 
     Animation* idleUpAnimation = Animation::create();
     idleUpAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 32, 32, 32)));
+    idleUpAnimation->setDelayPerUnit(1);
     AnimationCache::getInstance()->addAnimation(idleUpAnimation, "idleUpAnimation");
 
     Animation* idleDownAnimation = Animation::create();
     idleDownAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 0, 32, 32)));
+    idleDownAnimation->setDelayPerUnit(1);
     AnimationCache::getInstance()->addAnimation(idleDownAnimation, "idleDownAnimation");
 
     Animation* idleLeftAnimation = Animation::create();
     idleLeftAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 64, 32, 32)));
+    idleLeftAnimation->setDelayPerUnit(1);
     AnimationCache::getInstance()->addAnimation(idleLeftAnimation, "idleLeftAnimation");
 
     Animation* idleRightAnimation = Animation::create();
     idleRightAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(0, 96, 32, 32)));
+    idleRightAnimation->setDelayPerUnit(1);
     AnimationCache::getInstance()->addAnimation(idleRightAnimation, "idleRightAnimation");
 
 }
