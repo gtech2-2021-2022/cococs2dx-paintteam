@@ -105,10 +105,17 @@ bool HelloWorld::init()
 
     _collisions = _tileMap->layerNamed("Collisions");
     _collisions->setVisible(false);
-
+    //_tileMap->setTileSize({ 32, 32 });
 
     this->addChild(_tileMap);
 
+    Size const tileMapSize = { _tileMap->getMapSize().width * _tileMap->getTileSize().width, _tileMap->getMapSize().height * _tileMap->getTileSize().height };
+   
+    // Size ratio = (tileMapSize.width > visibleSize.width) ? Size({ tileMapSize / visibleSize.width, tileMapSize / visibleSize.height }) : Size({ tileMapSize / visibleSize.width, tileMapSize / visibleSize.height });
+    float ratio = (tileMapSize.width > visibleSize.width) ?  visibleSize.width/ tileMapSize.width : tileMapSize.width / visibleSize.width;
+    _tileMap->setScale(ratio);
+    
+    CCLOG("%f", ratio);
     //Add character
     player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
@@ -121,6 +128,10 @@ bool HelloWorld::init()
         _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
         this->addChild(_player, 0);
     }
+
+    // follow the player
+    auto followTheSprite = Follow::create(_player, Rect(0,0,visibleSize.width, tileMapSize.height));
+    this->runAction(followTheSprite);
 
     //Animation of the character
     player.createAnimation();
@@ -154,7 +165,7 @@ bool HelloWorld::init()
     menu->setVisible(false);
     this->addChild(menu, 1);
 
-
+   
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
@@ -231,7 +242,7 @@ void HelloWorld::pickPockeball(Sprite* _pb) {
         }
         else
         {
-            _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
+            //_pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
             this->addChild(_pb, 0);
         }
     }
