@@ -42,6 +42,67 @@ static void problemLoading(const char* filename)
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
 
+Size HelloWorld::setTileMap() {
+
+    m_tileMap = CCTMXTiledMap::create("Texture/TestRoom.tmx");
+    m_collisions = m_tileMap->layerNamed("Collisions");
+    m_collisions->setVisible(false);
+    /*
+    All layers with != y level 
+    DoorsOrigin 8
+    Doors 7
+    Collisions 6...
+    Grass
+    Rocks
+    Wall2
+    Wall
+    Ground2 ...1
+    Ground 0
+    */
+
+    //_tileMap->setTileSize({ 32, 32 }); Does not work maybe call before create?
+    this->addChild(m_tileMap);
+
+    Size const screenSize = Director::getInstance()->getVisibleSize();
+    Size const tileMapSize = { m_tileMap->getMapSize().width * m_tileMap->getTileSize().width, m_tileMap->getMapSize().height * m_tileMap->getTileSize().height };
+
+    Size followSize;
+    float ratio = 1;
+    if (screenSize.width < screenSize.height) {
+        ratio = (tileMapSize.height > screenSize.height) ? screenSize.height / tileMapSize.height : tileMapSize.height / screenSize.height;
+        followSize = Size({ tileMapSize.width*ratio, screenSize.height });
+
+
+    }
+    else {
+        ratio = (tileMapSize.width > screenSize.width) ? screenSize.width / tileMapSize.width : tileMapSize.width / screenSize.width;
+        followSize = (screenSize.width == screenSize.height) ? Size({ screenSize.width, screenSize.height }) : Size({screenSize.width, tileMapSize.height*ratio});
+    }
+    
+    m_tileMap->setScale(ratio);
+    return followSize;
+
+
+}
+
+Vec2 HelloWorld::offSetScreen(Vec2 playerLocation) {
+    Size const screenSize = Director::getInstance()->getVisibleSize();
+    if (screenSize.width > screenSize.height) {
+        if (playerLocation.y > screenSize.height / 2) {
+            log("player offset calculated");
+            return Vec2(0.f, playerLocation.y - (screenSize.height / 2));
+        }
+    }
+    else if (screenSize.width < screenSize.height) {
+        if (playerLocation.x > screenSize.width/2) {
+            log("player offset calculated");
+            return Vec2(playerLocation.x - (screenSize.width / 2), 0.f);
+        }
+    }
+    return Vec2::ZERO;
+}
+
+
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
@@ -55,7 +116,6 @@ bool HelloWorld::init()
     Director::getInstance()->setContentScaleFactor(1);
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
     /*/////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
@@ -87,35 +147,11 @@ bool HelloWorld::init()
     /////////////////////////////*/
 
     //Add map
-  
-    _tileMap = CCTMXTiledMap::create("Texture/TestRoom.tmx");
-    // _tileMap->initWithTMXFile("Texture/TestRoom.tmx");
-
-    /* 
-    Doors
-    Collisions
-    Doors
-    Grass
-    Rocks
-    Wall2
-    Wall
-    Ground2
-    Ground
-    */
-
-    _collisions = _tileMap->layerNamed("Collisions");
-    _collisions->setVisible(false);
-    //_tileMap->setTileSize({ 32, 32 });
-
-    this->addChild(_tileMap);
-
-    Size const tileMapSize = { _tileMap->getMapSize().width * _tileMap->getTileSize().width, _tileMap->getMapSize().height * _tileMap->getTileSize().height };
-   
-    // Size ratio = (tileMapSize.width > visibleSize.width) ? Size({ tileMapSize / visibleSize.width, tileMapSize / visibleSize.height }) : Size({ tileMapSize / visibleSize.width, tileMapSize / visibleSize.height });
-    float ratio = (tileMapSize.width > visibleSize.width) ?  visibleSize.width/ tileMapSize.width : tileMapSize.width / visibleSize.width;
-    _tileMap->setScale(ratio);
+    Size followSize = setTileMap();
     
-    CCLOG("%f", ratio);
+   
+
+
     //Add character
     player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
@@ -130,7 +166,7 @@ bool HelloWorld::init()
     }
 
     // follow the player
-    auto followTheSprite = Follow::create(_player, Rect(0,0,visibleSize.width, tileMapSize.height));
+    auto followTheSprite = Follow::create(_player, Rect(0,0,followSize.width, followSize.height));
     this->runAction(followTheSprite);
 
     //Animation of the character
@@ -161,7 +197,7 @@ bool HelloWorld::init()
     }
     auto menu = Menu::create(pickButton, NULL);
     menu->setPosition(Vec2::ZERO);
-    menu->setScale(0.1, 0.1);
+    menu->setScale(0.1f, 0.1f);
     menu->setVisible(false);
     this->addChild(menu, 1);
 
@@ -170,10 +206,30 @@ bool HelloWorld::init()
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
-        Vec2 pos;
-        pos = touch->getLocation();
+
+
+        Vec2 pos = touch->getLocation();
+        // touch->getLocationInView();
+        // 
+        //Vec2 destination =  pos - visibleSize/2 + _player->getPosition();
+        cocos2d::log("%f", pos.x);
+        log("%f", pos.y);
+
+        Vec2 offSet = offSetScreen(pos);
+        pos += offSet;
+
+        cocos2d::log("%f", pos.x);
+        log("%f", pos.y);
+
         Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
+        
+        /*log("%f", touch->getLocationInView().x);
+        log("%f", touch->getLocationInView().y);*/
+
+
+
         float angle = vector.getAngle() * 180 / PI;
+
         if (angle > -135 && angle < -45)
         {
             player.setDirection(UP);
@@ -188,7 +244,7 @@ bool HelloWorld::init()
             player.setDirection(RIGHT);
         }
         player.updateAnimation(_player, player.getDirection());
-        auto move = MoveTo::create(3, pos);
+        auto move = MoveTo::create(pos.length()/player.getPixelSpeed(), pos);
         auto test = [=]() {
             _player->stopAllActions();
             Animation* anim;

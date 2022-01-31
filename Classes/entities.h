@@ -44,6 +44,7 @@ public:
 	void updateAnimation(cocos2d::Sprite* _player, enum Direction direction);
 	void setDirection(Direction _direction) { direction = _direction;  };
 	Direction getDirection() { return direction;  };
+	const float getPixelSpeed() noexcept { return pixelPerSecond; };
 
 protected:
 	std::string _name;
@@ -58,6 +59,7 @@ protected:
 	int playerY = 0;
 	cocos2d::Sprite* playerSprite = nullptr;
 	Direction direction;
+	float const pixelPerSecond = 115;
 	
 };
 

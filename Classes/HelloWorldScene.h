@@ -35,8 +35,8 @@ class HelloWorld : public cocos2d::Scene
 private:
     Player player;
     Treasure pokeball;
-    cocos2d::CCTMXTiledMap* _tileMap;
-    cocos2d::CCTMXLayer* _collisions;
+    cocos2d::CCTMXTiledMap* m_tileMap;
+    cocos2d::CCTMXLayer* m_collisions;
 
 
 public:
@@ -44,10 +44,15 @@ public:
 
     virtual bool init();
     
+    cocos2d::Size setTileMap();
+    cocos2d::Vec2 offSetScreen(cocos2d::Vec2 playerLocation);
+
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     void pickPockeball(cocos2d::Sprite* _pb);
     
+
+
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 
