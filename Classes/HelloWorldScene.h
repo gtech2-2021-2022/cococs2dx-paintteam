@@ -34,6 +34,7 @@ class HelloWorld : public cocos2d::Scene
 {
 private:
     Player player;
+    Monster pokemon;
     Treasure pokeball;
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;

@@ -72,7 +72,7 @@ public:
 	std::string getName() { return _name; };
 	int getLife() { return life; };
 	int getDamage() { return dammage; };
-	void setMonsterSprite(std::string path, cocos2d::Rect size);
+	void setMonsterSprite();
 	cocos2d::Sprite* getMonsterSprite();
 
 protected:

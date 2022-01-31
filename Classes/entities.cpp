@@ -146,17 +146,17 @@ Monster::Monster()
         random = rand() % 4;
     } while (random == 0);
     if (random == 1) {
-        _name = "zombie";
+        _name = "Charmander";
         life = 50;
         dammage = 10;
     }
     else if (random == 2) {
-        _name = "skeleton";
+        _name = "Charmeleon";
         life = 100;
         dammage = 20;
     }
     else if (random == 3) {
-        _name = "enderman";
+        _name = "Charizard";
         life = 150;
         dammage = 30;
     }
@@ -173,9 +173,18 @@ void Monster::receiveDammage(int nbDammage)
     }
 }
 
-void Monster::setMonsterSprite(string path, Rect size)
+void Monster::setMonsterSprite()
 {
-    monsterSprite = Sprite::create(path, size);
+    if (_name == "Charmander")
+    {
+        monsterSprite = cocos2d::Sprite::create("pokemon/enemy.png", Rect(32, 0, 32, 32));
+    }
+    else if (_name == "Charmeleon") {
+        monsterSprite = cocos2d::Sprite::create("pokemon/enemy.png", Rect(32, 128, 32, 32));
+    }
+    else if (_name == "Charizard") {
+        monsterSprite = cocos2d::Sprite::create("pokemon/enemy.png", Rect(32, 256, 32, 32));
+    }
 }
 
 cocos2d::Sprite* Monster::getMonsterSprite()

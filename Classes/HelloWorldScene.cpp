@@ -174,6 +174,30 @@ bool HelloWorld::init()
     //Animation of the character
     player.createAnimation();
 
+    //Add pokemon
+    pokemon.setMonsterSprite();
+    auto _pokemon = pokemon.getMonsterSprite();
+    if (_pokemon == nullptr)
+    {
+        problemLoading("'pokemon/enemy.png'");
+    }
+    else
+    {
+        _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
+        this->addChild(_pokemon, 0);
+    }
+
+    //Add fightButton
+    auto fightButton = MenuItemImage::create("fight.png", "fight.png");
+    if (fightButton == nullptr || fightButton->getContentSize().width <= 0 || fightButton->getContentSize().height <= 0) {
+        problemLoading("'fight.png'");
+    }
+    auto fight = Menu::create(fightButton, NULL);
+    fight->setPosition(Vec2::ZERO);
+    fight->setScale(0.1f, 0.1f);
+    fight->setVisible(false);
+    this->addChild(fight, 1);
+
     //Add pokeball
     pokeball.setTreasureSprite("player/pokeball.png", Rect(0, 0, 16, 24));
     auto _pb = pokeball.getTreasureSprite();
@@ -183,7 +207,7 @@ bool HelloWorld::init()
     }
     else
     {
-        _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
+        _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
         this->addChild(_pb, 0);
     }
     log("%d", pokeball.getGoldNumber());
@@ -196,22 +220,19 @@ bool HelloWorld::init()
     if (pickButton == nullptr || pickButton->getContentSize().width <= 0 || pickButton->getContentSize().height <= 0) {
         problemLoading("'pick.png'");
     }
-    else {
-        float x = origin.x + visibleSize.width * 5.15;
-        float y = origin.y - visibleSize.height * 4;
-        pickButton->setPosition(Vec2(x, y));
-    }
-    auto menu = Menu::create(pickButton, NULL);
-    menu->setPosition(Vec2::ZERO);
-    menu->setScale(0.1f, 0.1f);
-    menu->setVisible(false);
-    this->addChild(menu, 1);
+    auto pick = Menu::create(pickButton, NULL);
+    pick->setPosition(Vec2::ZERO);
+    pick->setScale(0.1f, 0.1f);
+    pick->setVisible(false);
+    this->addChild(pick, 1);
 
    
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
+        fight->setVisible(false);
+        pick->setVisible(false);
         Vec2 pos = touch->getLocation();
         /* log("x player : %f, y player : %f", _player->getPosition().x, _player->getPosition().y);*/
 
@@ -260,10 +281,17 @@ bool HelloWorld::init()
             auto action = Animate::create(anim);
             _player->runAction(RepeatForever::create(action));
             if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox())) {
-                menu->setVisible(true);
+                float x = origin.x + visibleSize.width * 5.15;
+                float y = origin.y - visibleSize.height * 4;
+                pickButton->setPosition(Vec2(x, y) + offSetScreen(pos) * 10);
+                pick->setVisible(true);
             }
-            else {
-                menu->setVisible(false);
+            if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
+                float x = origin.x + visibleSize.width * 5.15;
+                float y = origin.y - visibleSize.height * 4;
+                log("x : %f y : %f", pos.x, pos.y);
+                fightButton->setPosition(Vec2(x, y) + offSetScreen(pos) * 10);
+                fight->setVisible(true);
             }
         };
         CallFunc* test2 = CallFunc::create(test);
