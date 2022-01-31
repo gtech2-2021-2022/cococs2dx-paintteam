@@ -189,9 +189,13 @@ bool HelloWorld::init()
         _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
         this->addChild(_pb, 0);
     }
+    log("%d", pokeball.getGoldNumber());
 
     //Add pickButton
-    auto pickButton = MenuItemImage::create("pick.png", "pick.png", CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
+    auto pickButton = MenuItemImage::create("pick.png", "pick.png",
+        [=](Ref*) {
+            pickPockeball(_pb, visibleSize, origin);
+        });
     if (pickButton == nullptr || pickButton->getContentSize().width <= 0 || pickButton->getContentSize().height <= 0) {
         problemLoading("'pick.png'");
     }
@@ -211,7 +215,6 @@ bool HelloWorld::init()
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
-
 
         Vec2 pos = touch->getLocation();
         // touch->getLocationInView();
@@ -292,18 +295,19 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::pickPockeball(Sprite* _pb) {
-    log("ooooooooooo");
+void HelloWorld::pickPockeball(Sprite* _pb, Size size, Vec2 origin) {
+    this->removeChild(_pb);
     if (!pokeball.isOpen()) {
+        this->removeChild(_pb);
         pokeball.setTreasureSprite("player/pokeball.png", Rect(32, 0, 16, 24));
-        auto _pb = pokeball.getTreasureSprite();
+        _pb = pokeball.getTreasureSprite();
         if (_pb == nullptr)
         {
             problemLoading("'player/pokeball.png'");
         }
         else
         {
-            //_pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 80, visibleSize.height / 2 + origin.y));
+            _pb->setPosition(Vec2(size.width / 2 + origin.x + 80, size.height / 2 + origin.y));
             this->addChild(_pb, 0);
         }
     }

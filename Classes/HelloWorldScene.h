@@ -50,7 +50,7 @@ public:
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-    void pickPockeball(cocos2d::Sprite* _pb);
+    void pickPockeball(cocos2d::Sprite* _pb, cocos2d::Size size, cocos2d::Vec2 origin);
     
 
 
