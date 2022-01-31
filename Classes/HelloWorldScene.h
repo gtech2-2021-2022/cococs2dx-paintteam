@@ -37,6 +37,7 @@ private:
     Treasure pokeball;
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;
+    float m_mapRatio = 1;
 
 
 public:

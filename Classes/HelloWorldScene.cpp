@@ -67,19 +67,16 @@ Size HelloWorld::setTileMap() {
     Size const tileMapSize = { m_tileMap->getMapSize().width * m_tileMap->getTileSize().width, m_tileMap->getMapSize().height * m_tileMap->getTileSize().height };
 
     Size followSize;
-    float ratio = 1;
     if (screenSize.width < screenSize.height) {
-        ratio = (tileMapSize.height > screenSize.height) ? screenSize.height / tileMapSize.height : tileMapSize.height / screenSize.height;
-        followSize = Size({ tileMapSize.width*ratio, screenSize.height });
-
-
+        m_mapRatio = (tileMapSize.height > screenSize.height) ? screenSize.height / tileMapSize.height : tileMapSize.height / screenSize.height;
+        followSize = Size({ tileMapSize.width* m_mapRatio, screenSize.height });
     }
     else {
-        ratio = (tileMapSize.width > screenSize.width) ? screenSize.width / tileMapSize.width : tileMapSize.width / screenSize.width;
-        followSize = (screenSize.width == screenSize.height) ? Size({ screenSize.width, screenSize.height }) : Size({screenSize.width, tileMapSize.height*ratio});
+        m_mapRatio = (tileMapSize.width > screenSize.width) ? screenSize.width / tileMapSize.width : tileMapSize.width / screenSize.width;
+        followSize = (screenSize.width == screenSize.height) ? Size({ screenSize.width, screenSize.height }) : Size({screenSize.width, tileMapSize.height* m_mapRatio });
     }
     
-    m_tileMap->setScale(ratio);
+    m_tileMap->setScale(m_mapRatio);
     return followSize;
 
 
@@ -89,14 +86,22 @@ Vec2 HelloWorld::offSetScreen(Vec2 playerLocation) {
     Size const screenSize = Director::getInstance()->getVisibleSize();
     if (screenSize.width > screenSize.height) {
         if (playerLocation.y > screenSize.height / 2) {
-            log("player offset calculated");
-            return Vec2(0.f, playerLocation.y - (screenSize.height / 2));
+            if (playerLocation.y < m_tileMap->getMapSize().height * m_tileMap->getTileSize().height * m_mapRatio - (screenSize.height / 2)) {
+                // Follow transition
+                return Vec2(0.f, playerLocation.y - (screenSize.height / 2));
+            }
+            // Top fixed
+            return Vec2(0.f, m_tileMap->getMapSize().height * m_tileMap->getTileSize().height - screenSize.height);
         }
     }
     else if (screenSize.width < screenSize.height) {
-        if (playerLocation.x > screenSize.width/2) {
-            log("player offset calculated");
-            return Vec2(playerLocation.x - (screenSize.width / 2), 0.f);
+        if (playerLocation.x > screenSize.width / 2) {
+            if (playerLocation.x < m_tileMap->getMapSize().width * m_tileMap->getTileSize().width * m_mapRatio - (screenSize.width / 2)) {
+                // Follow transition
+                return Vec2(playerLocation.x - (screenSize.width / 2), 0.f);
+            }
+            // Right fixed
+            return Vec2(0.f, m_tileMap->getMapSize().width * m_tileMap->getTileSize().width - screenSize.width);
         }
     }
     return Vec2::ZERO;
@@ -212,14 +217,14 @@ bool HelloWorld::init()
         // touch->getLocationInView();
         // 
         //Vec2 destination =  pos - visibleSize/2 + _player->getPosition();
-        cocos2d::log("%f", pos.x);
-        log("%f", pos.y);
+        /*cocos2d::log("%f", pos.x);
+        log("%f", pos.y);*/
 
         Vec2 offSet = offSetScreen(pos);
         pos += offSet;
 
-        cocos2d::log("%f", pos.x);
-        log("%f", pos.y);
+        /*cocos2d::log("%f", pos.x);
+        log("%f", pos.y);*/
 
         Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
         
