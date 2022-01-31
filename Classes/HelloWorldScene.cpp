@@ -82,29 +82,26 @@ Size HelloWorld::setTileMap() {
 
 }
 
+float HelloWorld::compareToOffset(float player, float screen, float tileMap) {
+    if (player > screen / 2) {
+        if (player < tileMap - (screen / 2)) {
+            // Follow transition
+            return player - (screen / 2);
+        }
+        // Top fixed
+        return tileMap - screen;
+    }
+    return 0.f;
+}
+
 Vec2 HelloWorld::offSetScreen(Vec2 playerLocation) {
     Size const screenSize = Director::getInstance()->getVisibleSize();
     if (screenSize.width > screenSize.height) {
-        if (playerLocation.y > screenSize.height / 2) {
-            if (playerLocation.y < m_tileMap->getMapSize().height * m_tileMap->getTileSize().height * m_mapRatio - (screenSize.height / 2)) {
-                // Follow transition
-                return Vec2(0.f, playerLocation.y - (screenSize.height / 2));
-            }
-            // Top fixed
-            return Vec2(0.f, m_tileMap->getMapSize().height * m_tileMap->getTileSize().height - screenSize.height);
-        }
+        return Vec2(0.f, compareToOffset(playerLocation.y, screenSize.height, m_tileMap->getMapSize().height * m_tileMap->getTileSize().height * m_mapRatio));
     }
     else if (screenSize.width < screenSize.height) {
-        if (playerLocation.x > screenSize.width / 2) {
-            if (playerLocation.x < m_tileMap->getMapSize().width * m_tileMap->getTileSize().width * m_mapRatio - (screenSize.width / 2)) {
-                // Follow transition
-                return Vec2(playerLocation.x - (screenSize.width / 2), 0.f);
-            }
-            // Right fixed
-            return Vec2(0.f, m_tileMap->getMapSize().width * m_tileMap->getTileSize().width - screenSize.width);
-        }
+        return Vec2(0.f, compareToOffset(playerLocation.x, screenSize.width, m_tileMap->getMapSize().width * m_tileMap->getTileSize().width * m_mapRatio));
     }
-    return Vec2::ZERO;
 }
 
 
@@ -215,43 +212,34 @@ bool HelloWorld::init()
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1;
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
-
         Vec2 pos = touch->getLocation();
-        // touch->getLocationInView();
-        // 
-        //Vec2 destination =  pos - visibleSize/2 + _player->getPosition();
-        /*cocos2d::log("%f", pos.x);
-        log("%f", pos.y);*/
+        /* log("x player : %f, y player : %f", _player->getPosition().x, _player->getPosition().y);*/
 
-        Vec2 offSet = offSetScreen(pos);
+        // camera offset
+        Vec2 offSet = offSetScreen(_player->getPosition());
         pos += offSet;
 
-        /*cocos2d::log("%f", pos.x);
-        log("%f", pos.y);*/
-
         Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
-        
-        /*log("%f", touch->getLocationInView().x);
-        log("%f", touch->getLocationInView().y);*/
-
-
-
-        float angle = vector.getAngle() * 180 / PI;
-
-        if (angle > -135 && angle < -45)
+        float directionAngle = fmod(vector.getAngle() * 180 / PI + 180, 360);
+        log("angle : %f", directionAngle);
+        if (directionAngle > 45 && directionAngle < 135)
         {
             player.setDirection(UP);
-        } else if (angle > -45 && angle < 45)
+        }
+        else if (directionAngle > 135 && directionAngle < 225)
         {
             player.setDirection(LEFT);
-        } else if (angle > 45 && angle < 135)
+        }
+        else if (directionAngle > 225 && directionAngle < 315)
         {
             player.setDirection(DOWN);
-        } else
+        }
+        else
         {
             player.setDirection(RIGHT);
         }
         player.updateAnimation(_player, player.getDirection());
+        log("lenght: %f, speed: %f, time: %f", pos.length(), player.getPixelSpeed(), pos.length() / player.getPixelSpeed());
         auto move = MoveTo::create(pos.length()/player.getPixelSpeed(), pos);
         auto test = [=]() {
             _player->stopAllActions();

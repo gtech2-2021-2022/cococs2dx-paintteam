@@ -47,6 +47,7 @@ public:
     
     cocos2d::Size setTileMap();
     cocos2d::Vec2 offSetScreen(cocos2d::Vec2 playerLocation);
+    float compareToOffset(float player, float screen, float tileMap);
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
