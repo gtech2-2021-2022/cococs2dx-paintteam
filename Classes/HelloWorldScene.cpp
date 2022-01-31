@@ -25,6 +25,7 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
 #include "Utils.h"
+#include "ui/CocosGUI.h"
 #include <math.h>
 #define PI           3.14159265358979323846  /* possiblement */
 
@@ -164,7 +165,7 @@ bool HelloWorld::init()
     else
     {
         _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-        this->addChild(_player, 0);
+        this->addChild(_player, 1);
     }
 
     // follow the player
@@ -173,6 +174,20 @@ bool HelloWorld::init()
 
     //Animation of the character
     player.createAnimation();
+
+    //Character's life
+    auto _charaLife = charaLife->getLifeBar();
+    if (_charaLife == nullptr)
+    {
+        problemLoading("'life.png'");
+    }
+    else
+    {
+        _charaLife->setPosition(Vec2(16, 35));
+        _charaLife->setPercent(100);
+        _charaLife->setScale(1.25, 1.25);
+        _player->addChild(_charaLife, 1);
+    }
 
     //Add pokemon
     pokemon.setMonsterSprite();
@@ -187,8 +202,25 @@ bool HelloWorld::init()
         this->addChild(_pokemon, 0);
     }
 
+    //Pokemon's life
+    auto _pokeLife = pokeLife->getLifeBar();
+    if (_pokeLife == nullptr)
+    {
+        problemLoading("'life.png'");
+    }
+    else
+    {
+        _pokeLife->setPosition(Vec2(16, 35));
+        _pokeLife->setPercent(100);
+        _pokeLife->setScale(1.25, 1.25);
+        _pokemon->addChild(_pokeLife, 0);
+    }
+
     //Add fightButton
-    auto fightButton = MenuItemImage::create("fight.png", "fight.png");
+    auto fightButton = MenuItemImage::create("fight.png", "fight.png",
+        [=](Ref*) {
+            fightPokemon(player, _player, pokemon, _pokemon);
+        });
     if (fightButton == nullptr || fightButton->getContentSize().width <= 0 || fightButton->getContentSize().height <= 0) {
         problemLoading("'fight.png'");
     }
@@ -210,7 +242,6 @@ bool HelloWorld::init()
         _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
         this->addChild(_pb, 0);
     }
-    log("%d", pokeball.getGoldNumber());
 
     //Add pickButton
     auto pickButton = MenuItemImage::create("pick.png", "pick.png",
@@ -289,7 +320,6 @@ bool HelloWorld::init()
             if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
                 float x = origin.x + visibleSize.width * 5.15;
                 float y = origin.y - visibleSize.height * 4;
-                log("x : %f y : %f", pos.x, pos.y);
                 fightButton->setPosition(Vec2(x, y) + offSetScreen(pos) * 10);
                 fight->setVisible(true);
             }
@@ -311,6 +341,20 @@ bool HelloWorld::init()
     return true;
 }
 
+void HelloWorld::fightPokemon(Player _player, cocos2d::Sprite* _pl, Monster _pokemon, cocos2d::Sprite* _pk) {
+    log("oooooooooo");
+    _pokemon.receiveDammage(_player.getWeaponDamage(_player.getWeapon()));
+    if (_pokemon.getLife() != 0) {
+        _player.receiveDammage(_pokemon.getDamage());
+        if (_player.getLife() == 0) {
+            this->removeChild(_pl);
+        }
+    }
+    else {
+        this->removeChild(_pk);
+    }
+}
+
 void HelloWorld::pickPockeball(Sprite* _pb, Size size, Vec2 origin) {
     this->removeChild(_pb);
     if (!pokeball.isOpen()) {
@@ -327,17 +371,4 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size size, Vec2 origin) {
             this->addChild(_pb, 0);
         }
     }
-}
-
-void HelloWorld::menuCloseCallback(Ref* pSender)
-{
-    //Close the cocos2d-x game scene and quit the application
-    //Director::getInstance()->end();
-
-    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
-
-    //EventCustom customEndEvent("game_scene_close_event");
-    //_eventDispatcher->dispatchEvent(&customEndEvent);
-
-
 }

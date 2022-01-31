@@ -28,13 +28,16 @@
 #include "cocos2d.h"
 #include "entities.h"
 #include "item.h"
+#include "lifebar.h"
 
 
 class HelloWorld : public cocos2d::Scene
 {
 private:
     Player player;
+    LifeBar* charaLife = new LifeBar(player.getLife());
     Monster pokemon;
+    LifeBar* pokeLife = new LifeBar(pokemon.getLife());
     Treasure pokeball;
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;
@@ -49,9 +52,7 @@ public:
     cocos2d::Size setTileMap();
     cocos2d::Vec2 offSetScreen(cocos2d::Vec2 playerLocation);
     float compareToOffset(float player, float screen, float tileMap);
-
-    // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
+    void fightPokemon(Player _player, cocos2d::Sprite* _pl, Monster _pokemon, cocos2d::Sprite* _pk);
     void pickPockeball(cocos2d::Sprite* _pb, cocos2d::Size size, cocos2d::Vec2 origin);
     
 
