@@ -102,6 +102,9 @@ Vec2 HelloWorld::offSetScreen(Vec2 playerLocation) {
     }
     else if (screenSize.width < screenSize.height) {
         return Vec2(0.f, compareToOffset(playerLocation.x, screenSize.width, m_tileMap->getMapSize().width * m_tileMap->getTileSize().width * m_mapRatio));
+    } 
+    else {
+        return Vec2(0.f, 0.f);
     }
 }
 
