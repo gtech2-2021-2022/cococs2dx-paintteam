@@ -11,6 +11,7 @@ public:
 	LifeBar(int _life);
 	cocos2d::ui::LoadingBar* getLifeBar() { return bar; };
 	void updateLife(int dammage);
+	int getLife() { return life; };
 
 protected:
 	float lifeMax = 0;

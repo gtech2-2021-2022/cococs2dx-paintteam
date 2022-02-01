@@ -55,8 +55,8 @@ public:
     float compareToOffset(float player, float screen, float tileMap);
     cocos2d::CCPoint HelloWorld::getTileNumber(cocos2d::Vec2 coords);
 
-    void fightPokemon(Player _player, cocos2d::Sprite* _pl, Monster _pokemon, cocos2d::Sprite* _pk);
-    void pickPockeball(cocos2d::Sprite* _pb, cocos2d::Size size, cocos2d::Vec2 origin);
+    void fightPokemon(Player _player, cocos2d::Sprite* _pl, LifeBar* _charaLife, Monster _pokemon, cocos2d::Sprite* _pk, LifeBar* _pokeLife);
+    void pickPockeball(cocos2d::Sprite* _pb);
     
 
 

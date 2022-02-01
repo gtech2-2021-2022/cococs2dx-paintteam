@@ -229,20 +229,6 @@ bool HelloWorld::init()
         _pokemon->addChild(_pokeLife, 0);
     }
 
-    //Add fightButton
-    auto fightButton = MenuItemImage::create("fight.png", "fight.png",
-        [=](Ref*) {
-            fightPokemon(player, _player, pokemon, _pokemon);
-        });
-    if (fightButton == nullptr || fightButton->getContentSize().width <= 0 || fightButton->getContentSize().height <= 0) {
-        problemLoading("'fight.png'");
-    }
-    auto fight = Menu::create(fightButton, NULL);
-    fight->setPosition(Vec2::ZERO);
-    fight->setScale(0.1f, 0.1f);
-    fight->setVisible(false);
-    this->addChild(fight, 1);
-
     //Add pokeball
     pokeball.setTreasureSprite("player/pokeball.png", Rect(0, 0, 16, 24));
     auto _pb = pokeball.getTreasureSprite();
@@ -257,19 +243,31 @@ bool HelloWorld::init()
         m_intermediateNode->addChild(_pb, 0);
     }
 
+    //Add fightButton
+    auto fightButton = MenuItemImage::create("fight.png", "fight.png",
+        [=](Ref*) {
+            fightPokemon(player, _player, charaLife, pokemon, _pokemon, pokeLife);
+        });
+    if (fightButton == nullptr || fightButton->getContentSize().width <= 0 || fightButton->getContentSize().height <= 0) {
+        problemLoading("'fight.png'");
+    }
+    auto fight = Menu::create(fightButton, NULL);
+    fight->setPosition(Vec2::ZERO);
+    fight->setVisible(false);
+    m_intermediateNode->addChild(fight, 1);
+
     //Add pickButton
     auto pickButton = MenuItemImage::create("pick.png", "pick.png",
         [=](Ref*) {
-            pickPockeball(_pb, visibleSize, origin);
+            pickPockeball(_pb);
         });
     if (pickButton == nullptr || pickButton->getContentSize().width <= 0 || pickButton->getContentSize().height <= 0) {
         problemLoading("'pick.png'");
     }
     auto pick = Menu::create(pickButton, NULL);
     pick->setPosition(Vec2::ZERO);
-    pick->setScale(0.1f, 0.1f);
     pick->setVisible(false);
-    this->addChild(pick, 1);
+    m_intermediateNode->addChild(pick, 1);
 
    
     //Move character on click
@@ -323,16 +321,17 @@ bool HelloWorld::init()
             auto action = Animate::create(anim);
             _player->runAction(RepeatForever::create(action));
             if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox())) {
-                float x = origin.x + visibleSize.width * 5.15;
-                float y = origin.y - visibleSize.height * 4;
-                pickButton->setPosition(Vec2(x, y) + offSetScreen(pos) * 10);
+                float x = origin.x + visibleSize.width - pickButton->getContentSize().width / 20;
+                float y = origin.y + pickButton->getContentSize().height / 20;
+                pickButton->setPosition(Vec2(x, y) + offSetScreen(pos));
+                pickButton->setScale(0.1f, 0.1f);
                 pick->setVisible(true);
             }
             if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
-                float x = origin.x + visibleSize.width * 5.15;
-                float y = origin.y - visibleSize.height * 4;
-                fightButton->setPosition(Vec2(x, y));
-                
+                float x = origin.x + visibleSize.width - fightButton->getContentSize().width / 20;
+                float y = origin.y + fightButton->getContentSize().height / 20;
+                fightButton->setPosition(Vec2(x, y) + offSetScreen(pos));
+                fightButton->setScale(0.1f, 0.1f);
                 fight->setVisible(true);
             }
         };
@@ -353,34 +352,25 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::fightPokemon(Player _player, cocos2d::Sprite* _pl, Monster _pokemon, cocos2d::Sprite* _pk) {
-    log("oooooooooo");
+void HelloWorld::fightPokemon(Player _player, cocos2d::Sprite* _pl, LifeBar* _charaLife, Monster _pokemon, cocos2d::Sprite* _pk, LifeBar* _pokeLife) {
     _pokemon.receiveDammage(_player.getWeaponDamage(_player.getWeapon()));
-    if (_pokemon.getLife() != 0) {
+    _pokeLife->updateLife(_player.getWeaponDamage(_player.getWeapon()));
+    if (_pokeLife->getLife() != 0) {
         _player.receiveDammage(_pokemon.getDamage());
-        if (_player.getLife() == 0) {
-            this->removeChild(_pl);
+        _charaLife->updateLife(_pokemon.getDamage());
+        if (_charaLife->getLife() == 0) {
+            m_intermediateNode->removeChild(_pl);
         }
     }
     else {
-        this->removeChild(_pk);
+        m_intermediateNode->removeChild(_pk);
     }
 }
 
-void HelloWorld::pickPockeball(Sprite* _pb, Size size, Vec2 origin) {
-    this->removeChild(_pb);
+void HelloWorld::pickPockeball(Sprite* _pb) {
     if (!pokeball.isOpen()) {
-        this->removeChild(_pb);
-        pokeball.setTreasureSprite("player/pokeball.png", Rect(32, 0, 16, 24));
-        _pb = pokeball.getTreasureSprite();
-        if (_pb == nullptr)
-        {
-            problemLoading("'player/pokeball.png'");
-        }
-        else
-        {
-            _pb->setPosition(Vec2(size.width / 2 + origin.x + 80, size.height / 2 + origin.y));
-            m_intermediateNode->addChild(_pb, 0);
-        }
+        pokeball.setOpen(true);
+        _pb->setTexture("player/pokeball.png");
+        _pb->setTextureRect(Rect(32, 0, 16, 24));
     }
 }
