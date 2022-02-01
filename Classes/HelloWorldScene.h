@@ -42,6 +42,7 @@ private:
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;
     float m_mapRatio = 1;
+    cocos2d::Node* m_intermediateNode;
 
 
 public:
@@ -52,6 +53,8 @@ public:
     cocos2d::Size setTileMap();
     cocos2d::Vec2 offSetScreen(cocos2d::Vec2 playerLocation);
     float compareToOffset(float player, float screen, float tileMap);
+    cocos2d::CCPoint HelloWorld::getTileNumber(cocos2d::Vec2 coords);
+
     void fightPokemon(Player _player, cocos2d::Sprite* _pl, Monster _pokemon, cocos2d::Sprite* _pk);
     void pickPockeball(cocos2d::Sprite* _pb, cocos2d::Size size, cocos2d::Vec2 origin);
     

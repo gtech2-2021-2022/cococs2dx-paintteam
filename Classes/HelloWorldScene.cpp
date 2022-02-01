@@ -62,7 +62,7 @@ Size HelloWorld::setTileMap() {
     */
 
     //_tileMap->setTileSize({ 32, 32 }); Does not work maybe call before create?
-    this->addChild(m_tileMap);
+    m_intermediateNode->addChild(m_tileMap);
 
     Size const screenSize = Director::getInstance()->getVisibleSize();
     Size const tileMapSize = { m_tileMap->getMapSize().width * m_tileMap->getTileSize().width, m_tileMap->getMapSize().height * m_tileMap->getTileSize().height };
@@ -81,6 +81,12 @@ Size HelloWorld::setTileMap() {
     return followSize;
 
 
+}
+
+CCPoint HelloWorld::getTileNumber(Vec2 coords) {
+    Vec2 tileSize = m_tileMap->getTileSize() * m_mapRatio;
+
+    return tileSize;
 }
 
 float HelloWorld::compareToOffset(float player, float screen, float tileMap) {
@@ -118,6 +124,9 @@ bool HelloWorld::init()
     {
         return false;
     }
+
+    m_intermediateNode = Node::create();
+    this->addChild(m_intermediateNode);
 
     Director::getInstance()->setContentScaleFactor(1);
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -168,12 +177,13 @@ bool HelloWorld::init()
     else
     {
         _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-        this->addChild(_player, 1);
+        m_intermediateNode->addChild(_player, 1);
+        //_player->setScale(1/m_mapRatio);
     }
 
     // follow the player
     auto followTheSprite = Follow::create(_player, Rect(0,0,followSize.width, followSize.height));
-    this->runAction(followTheSprite);
+    m_intermediateNode->runAction(followTheSprite);
 
     //Animation of the character
     player.createAnimation();
@@ -202,7 +212,7 @@ bool HelloWorld::init()
     else
     {
         _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
-        this->addChild(_pokemon, 0);
+        m_intermediateNode->addChild(_pokemon, 0);
     }
 
     //Pokemon's life
@@ -243,7 +253,8 @@ bool HelloWorld::init()
     else
     {
         _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
-        this->addChild(_pb, 0);
+        Vec2 offSet = offSetScreen(_player->getPosition());
+        m_intermediateNode->addChild(_pb, 0);
     }
 
     //Add pickButton
@@ -268,12 +279,9 @@ bool HelloWorld::init()
         fight->setVisible(false);
         pick->setVisible(false);
         Vec2 pos = touch->getLocation();
-        /* log("x player : %f, y player : %f", _player->getPosition().x, _player->getPosition().y);*/
-
-        // camera offset
         Vec2 offSet = offSetScreen(_player->getPosition());
         pos += offSet;
-
+        
         Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
         float directionAngle = fmod(vector.getAngle() * 180 / PI + 180, 360);
         log("angle : %f", directionAngle);
@@ -323,7 +331,8 @@ bool HelloWorld::init()
             if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
                 float x = origin.x + visibleSize.width * 5.15;
                 float y = origin.y - visibleSize.height * 4;
-                fightButton->setPosition(Vec2(x, y) + offSetScreen(pos) * 10);
+                fightButton->setPosition(Vec2(x, y));
+                
                 fight->setVisible(true);
             }
         };
@@ -371,7 +380,7 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size size, Vec2 origin) {
         else
         {
             _pb->setPosition(Vec2(size.width / 2 + origin.x + 80, size.height / 2 + origin.y));
-            this->addChild(_pb, 0);
+            m_intermediateNode->addChild(_pb, 0);
         }
     }
 }
