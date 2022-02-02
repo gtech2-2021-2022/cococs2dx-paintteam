@@ -29,7 +29,8 @@
 #include "entities.h"
 #include "item.h"
 #include "lifebar.h"
-
+#include "Utils.h"
+#include "MapHandler.h"
 
 class HelloWorld : public cocos2d::Scene
 {
@@ -41,8 +42,11 @@ private:
     Treasure pokeball;
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;
-    float m_mapRatio = 1;
     cocos2d::Node* m_intermediateNode;
+    // MapHandler m_mapHandler;
+    float m_mapRatio = 1;
+    float m_mapButtonRatio = 0.2f;
+
 
 
 public:
@@ -53,7 +57,8 @@ public:
     cocos2d::Size setTileMap();
     cocos2d::Vec2 offSetScreen(cocos2d::Vec2 playerLocation);
     float compareToOffset(float player, float screen, float tileMap);
-    cocos2d::CCPoint HelloWorld::getTileNumber(cocos2d::Vec2 coords);
+    cocos2d::Vec2 HelloWorld::getTileNumber(cocos2d::Vec2 coords);
+    void setPlayerDirection(float directionAngle);
 
     void fightPokemon(Player _player, cocos2d::Sprite* _pl, LifeBar* _charaLife, Monster _pokemon, cocos2d::Sprite* _pk, LifeBar* _pokeLife);
     void pickPockeball(cocos2d::Sprite* _pb);

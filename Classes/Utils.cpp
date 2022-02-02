@@ -3,7 +3,8 @@
 
 using namespace cocos2d;
 
-static void problemLoading(const char* filename)
+// Print useful error message instead of segfaulting when files are not there.
+void Utils::problemLoading (const char* filename)
 {
 	printf("Error while loading: %s\n", filename);
 	printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
@@ -11,10 +12,19 @@ static void problemLoading(const char* filename)
 
 
 Sprite* Utils::createSprite(const char* fileName) {
-	auto sprite = Sprite::create("lvl/Map3.png");
+	auto sprite = Sprite::create(fileName);
 	if (sprite == nullptr)
 	{
-		problemLoading("'lvl/Map3.png'");
+		problemLoading(fileName);
+	}
+	return sprite;
+}
+
+cocos2d::Sprite* Utils::createSprite(const char* fileName,const cocos2d::Rect size) {
+	Sprite* sprite = Sprite::create(fileName, size);
+	if (sprite == nullptr)
+	{
+		problemLoading(fileName);
 	}
 	return sprite;
 }

@@ -1,10 +1,6 @@
-#include <iostream>
-#include "map.h"
-#include "entities.h"
-#include "item.h"
-#include <Windows.h>
+#include "MapHandler.h"
 
-Map::Map()
+MapHandler::MapHandler()
 {
 	for (int y = 0; y < size; y++)
 	{
@@ -93,56 +89,9 @@ Map::Map()
 	}
 }
 
-std::string Map::stringRepresentation(Player &player)
-{
-	std::stringstream string_stream;
-	std::string playerName = player.GetName();
-	int playerY = player.getPlayerY();
-	int playerX = player.getPlayerX();
-	for (int y = 0; y < size; y++)
-	{
-		for (int x = 0; x < size; x++)
-		{
-			if (playerY == y && playerX == x)
-			{
-				string_stream << "\u001b[32m" << playerName.front() << "\u001b[0m";
-			}
-			else if (_room[y][x].isRoomExisting() == true)
-			{
-					string_stream << "S";
-			}
-			else
-			{
-				string_stream << " ";
-			}
-			if (_room[y][x].hasEastLink())
-			{
-				string_stream << "-";
-			}
-			else
-			{
-				string_stream << " ";
-			}
-		}
-		string_stream << "\n";
-		for (int x = 0; x < size; x++)
-		{
-			if (_room[y][x].hasSouthLink())
-			{
-				string_stream << "|";
-			}
-			else
-			{
-				string_stream << " ";
-			}
-			string_stream << " ";
-		}
-		string_stream << "\n";
-	}
-	return string_stream.str();
-}
 
-bool Map::win()
+
+bool MapHandler::win()
 {
 	int i = 0;
 	for (int y = 0; y < size; y++)

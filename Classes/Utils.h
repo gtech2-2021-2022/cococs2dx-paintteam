@@ -10,7 +10,9 @@ class Utils
 {
 	
 	public:
-		cocos2d::Sprite* createSprite(const char* fileName);
+		static cocos2d::Sprite* createSprite(const char* fileName);
+		static cocos2d::Sprite* createSprite(const char* fileName,const cocos2d::Rect size);
+		static void problemLoading(const char* filename);
 };
 
 //#endif

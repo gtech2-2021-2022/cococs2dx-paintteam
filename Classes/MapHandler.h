@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "entities.h"
+#include "item.h"
 
 class Player;
 
@@ -75,12 +77,11 @@ protected:
 };
 
 
-class Map
+class MapHandler
 {
 public:
 	const int size = 5;
-	Map();
-	std::string stringRepresentation(Player &player);
+	MapHandler();
 	Room& getRoom(int y, int x) { return _room[y][x]; };
 	int getPlayerY() { return playerY; };
 	int getPlayerX() { return playerX; };

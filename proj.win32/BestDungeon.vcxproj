@@ -156,7 +156,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources\" /D /E /I /F /Y
     <ClCompile Include="..\Classes\item.cpp" />
     <ClCompile Include="..\Classes\lifebar.cpp" />
     <ClCompile Include="..\Classes\MainMenuScene.cpp" />
-    <ClCompile Include="..\Classes\map.cpp" />
+    <ClCompile Include="..\Classes\MapHandler.cpp" />
     <ClCompile Include="..\Classes\Utils.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MasterRoom.cpp" />
@@ -168,7 +168,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources\" /D /E /I /F /Y
     <ClInclude Include="..\Classes\item.h" />
     <ClInclude Include="..\Classes\lifebar.h" />
     <ClInclude Include="..\Classes\MainMenuScene.h" />
-    <ClInclude Include="..\Classes\map.h" />
+    <ClInclude Include="..\Classes\MapHandler.h" />
     <ClInclude Include="..\Classes\Utils.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MasterRoom.h" />

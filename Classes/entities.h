@@ -4,6 +4,7 @@
 #include <string>
 #include "item.h"
 #include "cocos2d.h"
+#include "Utils.h"
 
 
 class Map;
@@ -38,13 +39,14 @@ public:
 	void setPlayerX(int _playerX) { playerX = _playerX; };
 	int getPlayerY() { return playerY; };
 	int getPlayerX() { return playerX; };
-	void setPlayerSprite(std::string path, cocos2d::Rect size) { playerSprite = cocos2d::Sprite::create(path, size); };
+	void setPlayerSprite(const char* path, const cocos2d::Rect size) { playerSprite = Utils::createSprite(path, size); };
 	cocos2d::Sprite* getPlayerSprite() { return playerSprite; };
 	void createAnimation();
 	void updateAnimation(cocos2d::Sprite* _player, enum Direction direction);
 	void setDirection(Direction _direction) { direction = _direction;  };
 	Direction getDirection() { return direction;  };
 	const float getPixelSpeed() noexcept { return pixelPerSecond; };
+	void becomeIdle();
 
 protected:
 	std::string _name;

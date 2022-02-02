@@ -24,7 +24,6 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
-#include "Utils.h"
 #include "ui/CocosGUI.h"
 #include <math.h>
 #define PI           3.14159265358979323846  /* possiblement */
@@ -36,12 +35,6 @@ Scene* HelloWorld::createScene()
     return HelloWorld::create();
 }
 
-// Print useful error message instead of segfaulting when files are not there.
-static void problemLoading(const char* filename)
-{
-    printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
-}
 
 Size HelloWorld::setTileMap() {
 
@@ -60,7 +53,6 @@ Size HelloWorld::setTileMap() {
     Ground2 ...1
     Ground 0
     */
-
     //_tileMap->setTileSize({ 32, 32 }); Does not work maybe call before create?
     m_intermediateNode->addChild(m_tileMap);
 
@@ -79,14 +71,13 @@ Size HelloWorld::setTileMap() {
     
     m_tileMap->setScale(m_mapRatio);
     return followSize;
-
-
 }
 
-CCPoint HelloWorld::getTileNumber(Vec2 coords) {
+Vec2 HelloWorld::getTileNumber(Vec2 coords) {
     Vec2 tileSize = m_tileMap->getTileSize() * m_mapRatio;
-
-    return tileSize;
+    Vec2 tileCoord = coords - Vec2(fmod(coords.x, tileSize.x), fmod(coords.y, tileSize.y));
+    Vec2 tileNumber = Vec2(floor(tileCoord.x/tileSize.x), ceil(m_tileMap->getMapSize().height - 1 - tileCoord.y/tileSize.y)); // -1 because y starts at 0 for tiles but height must be < mapSize
+    return tileNumber;
 }
 
 float HelloWorld::compareToOffset(float player, float screen, float tileMap) {
@@ -114,6 +105,25 @@ Vec2 HelloWorld::offSetScreen(Vec2 playerLocation) {
     }
 }
 
+void HelloWorld::setPlayerDirection(float directionAngle) {
+    if (directionAngle > 45 && directionAngle < 135)
+    {
+        player.setDirection(UP);
+    }
+    else if (directionAngle > 135 && directionAngle < 225)
+    {
+        player.setDirection(LEFT);
+    }
+    else if (directionAngle > 225 && directionAngle < 315)
+    {
+        player.setDirection(DOWN);
+    }
+    else
+    {
+        player.setDirection(RIGHT);
+    }
+}
+
 
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
@@ -129,57 +139,18 @@ bool HelloWorld::init()
     this->addChild(m_intermediateNode);
 
     Director::getInstance()->setContentScaleFactor(1);
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    /*/////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
-    if (closeItem == nullptr ||
-        closeItem->getContentSize().width <= 0 ||
-        closeItem->getContentSize().height <= 0)
-    {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
-    }
-    else
-    {
-        float x = origin.x + visibleSize.width - closeItem->getContentSize().width/2;
-        float y = origin.y + closeItem->getContentSize().height/2;
-        closeItem->setPosition(Vec2(x,y));
-    }
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-
-    /////////////////////////////*/
+    const auto visibleSize = Director::getInstance()->getVisibleSize();
+    const Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     //Add map
-    Size followSize = setTileMap();
+    Size const followSize = setTileMap();
     
-   
-
 
     //Add character
     player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
-    if (_player == nullptr)
-    {
-        problemLoading("'player/player.png'");
-    }
-    else
-    {
-        _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-        m_intermediateNode->addChild(_player, 1);
-        //_player->setScale(1/m_mapRatio);
-    }
+    _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    m_intermediateNode->addChild(_player, 1);
 
     // follow the player
     auto followTheSprite = Follow::create(_player, Rect(0,0,followSize.width, followSize.height));
@@ -192,7 +163,7 @@ bool HelloWorld::init()
     auto _charaLife = charaLife->getLifeBar();
     if (_charaLife == nullptr)
     {
-        problemLoading("'life.png'");
+        Utils::problemLoading("'life.png'");
     }
     else
     {
@@ -205,21 +176,14 @@ bool HelloWorld::init()
     //Add pokemon
     pokemon.setMonsterSprite();
     auto _pokemon = pokemon.getMonsterSprite();
-    if (_pokemon == nullptr)
-    {
-        problemLoading("'pokemon/enemy.png'");
-    }
-    else
-    {
-        _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
-        m_intermediateNode->addChild(_pokemon, 0);
-    }
+    _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
+    m_intermediateNode->addChild(_pokemon, 0);
 
     //Pokemon's life
     auto _pokeLife = pokeLife->getLifeBar();
     if (_pokeLife == nullptr)
     {
-        problemLoading("'life.png'");
+        Utils::problemLoading("'life.png'");
     }
     else
     {
@@ -232,16 +196,8 @@ bool HelloWorld::init()
     //Add pokeball
     pokeball.setTreasureSprite("player/pokeball.png", Rect(0, 0, 16, 24));
     auto _pb = pokeball.getTreasureSprite();
-    if (_pb == nullptr)
-    {
-        problemLoading("'player/pokeball.png'");
-    }
-    else
-    {
-        _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
-        Vec2 offSet = offSetScreen(_player->getPosition());
-        m_intermediateNode->addChild(_pb, 0);
-    }
+    _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
+    m_intermediateNode->addChild(_pb, 0);
 
     //Add fightButton
     auto fightButton = MenuItemImage::create("fight.png", "fight.png",
@@ -249,7 +205,7 @@ bool HelloWorld::init()
             fightPokemon(player, _player, charaLife, pokemon, _pokemon, pokeLife);
         });
     if (fightButton == nullptr || fightButton->getContentSize().width <= 0 || fightButton->getContentSize().height <= 0) {
-        problemLoading("'fight.png'");
+        Utils::problemLoading("'fight.png'");
     }
     auto fight = Menu::create(fightButton, NULL);
     fight->setPosition(Vec2::ZERO);
@@ -262,64 +218,42 @@ bool HelloWorld::init()
             pickPockeball(_pb);
         });
     if (pickButton == nullptr || pickButton->getContentSize().width <= 0 || pickButton->getContentSize().height <= 0) {
-        problemLoading("'pick.png'");
+        Utils::problemLoading("'pick.png'");
     }
     auto pick = Menu::create(pickButton, NULL);
     pick->setPosition(Vec2::ZERO);
     pick->setVisible(false);
     m_intermediateNode->addChild(pick, 1);
+    
+    //Add MapButton
+    auto mapButton = MenuItemImage::create("map.png", "map.png",
+        [=](Ref*) {
+    
+        });
+    if (mapButton == nullptr || mapButton->getContentSize().width <= 0 || mapButton->getContentSize().height <= 0) {
+        Utils::problemLoading("'map.png'");
+    }
+    auto mapB = Menu::create(mapButton, NULL);
+    mapB->setPosition(Vec2(visibleSize.width - (mapB->getContentSize().width/20), visibleSize.height - (mapB->getContentSize().height /20)));
+    mapB->setScale(m_mapButtonRatio);
+    mapB->setVisible(true);
+    m_intermediateNode->addChild(mapB, 1);
 
-   
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
-    const int movementTag = 1;
+    const int movementTag = 1; // constexpr
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
         fight->setVisible(false);
         pick->setVisible(false);
-        Vec2 pos = touch->getLocation();
-        Vec2 offSet = offSetScreen(_player->getPosition());
-        pos += offSet;
-        
-        Vec2 vector = { _player->getPosition().x - pos.x, _player->getPosition().y - pos.y };
-        float directionAngle = fmod(vector.getAngle() * 180 / PI + 180, 360);
-        log("angle : %f", directionAngle);
-        if (directionAngle > 45 && directionAngle < 135)
-        {
-            player.setDirection(UP);
-        }
-        else if (directionAngle > 135 && directionAngle < 225)
-        {
-            player.setDirection(LEFT);
-        }
-        else if (directionAngle > 225 && directionAngle < 315)
-        {
-            player.setDirection(DOWN);
-        }
-        else
-        {
-            player.setDirection(RIGHT);
-        }
+
+        Vec2 const pos = touch->getLocation() + offSetScreen(_player->getPosition());  
+        MoveTo* move = MoveTo::create(Vec2(pos - _player->getPosition()).length()/player.getPixelSpeed(), pos);
+        setPlayerDirection(fmod(Vec2(_player->getPosition().x - pos.x, _player->getPosition().y - pos.y).getAngle() * 180 / PI + 180, 360));
         player.updateAnimation(_player, player.getDirection());
-        log("lenght: %f, speed: %f, time: %f", pos.length(), player.getPixelSpeed(), pos.length() / player.getPixelSpeed());
-        auto move = MoveTo::create(pos.length()/player.getPixelSpeed(), pos);
-        auto test = [=]() {
-            _player->stopAllActions();
-            Animation* anim;
-            if (player.getDirection() == UP) {
-                anim = AnimationCache::getInstance()->getAnimation("idleUpAnimation");
-            }
-            else if (player.getDirection() == DOWN) {
-                anim = AnimationCache::getInstance()->getAnimation("idleDownAnimation");
-            }
-            else if (player.getDirection() == LEFT) {
-                anim = AnimationCache::getInstance()->getAnimation("idleLeftAnimation");
-            }
-            else {
-                anim = AnimationCache::getInstance()->getAnimation("idleRightAnimation");
-            }
-            auto sf = anim->getFrames().at(0)->getSpriteFrame();
-            auto action = Animate::create(anim);
-            _player->runAction(RepeatForever::create(action));
+        
+        auto playerStop = [=]() {
+            player.becomeIdle();
+
             if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox())) {
                 float x = origin.x + visibleSize.width - pickButton->getContentSize().width / 20;
                 float y = origin.y + pickButton->getContentSize().height / 20;
@@ -335,15 +269,17 @@ bool HelloWorld::init()
                 fight->setVisible(true);
             }
         };
-        CallFunc* test2 = CallFunc::create(test);
+        CallFunc* becomeIdle = CallFunc::create(playerStop);
         move->setTag(movementTag);
-        Sequence* okmonbro = Sequence::create({move, test2});
+
+        Sequence* moveThenIdle = Sequence::create({move, becomeIdle});
+
         if (_player->getNumberOfRunningActions() == 0) {
-            _player->runAction(okmonbro);
+            _player->runAction(moveThenIdle);
         }
         else if (_player->getNumberOfRunningActions() != 0) {
             _player->stopActionByTag(movementTag);
-            _player->runAction(okmonbro);
+            _player->runAction(moveThenIdle);
         }
         return true;
     };

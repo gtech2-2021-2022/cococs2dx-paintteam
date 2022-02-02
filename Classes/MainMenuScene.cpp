@@ -31,7 +31,7 @@ bool MainMenu::init()
 
     //Add map
     auto sprite = Sprite::create("lvl/Map3.png");
-    sprite->setScale(1.7,1.25);
+    sprite->setScale(1.7f,1.25f);
     if (sprite == nullptr)
     {
         problemLoading("'lvl/Map3.png'");

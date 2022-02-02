@@ -62,7 +62,7 @@ void Player::setArmor(Armor* armor)
 
 void Player::createAnimation() {
     Animation* walkUpAnimation = Animation::create();
-    for (int i = 1; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         walkUpAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 32, 32, 32)));
     }
@@ -70,7 +70,7 @@ void Player::createAnimation() {
     AnimationCache::getInstance()->addAnimation(walkUpAnimation, "walkUpAnimation");
 
     Animation* walkDownAnimation = Animation::create();
-    for (int i = 1; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         walkDownAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 0, 32, 32)));
     }
@@ -78,7 +78,7 @@ void Player::createAnimation() {
     AnimationCache::getInstance()->addAnimation(walkDownAnimation, "walkDownAnimation");
 
     Animation* walkLeftAnimation = Animation::create();
-    for (int i = 1; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         walkLeftAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 64, 32, 32)));
     }
@@ -86,7 +86,7 @@ void Player::createAnimation() {
     AnimationCache::getInstance()->addAnimation(walkLeftAnimation, "walkLeftAnimation");
 
     Animation* walkRightAnimation = Animation::create();
-    for (int i = 1; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         walkRightAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 96, 32, 32)));
     }
@@ -138,6 +138,26 @@ void Player::updateAnimation(Sprite* _player, Direction direction) {
     _player->runAction(RepeatForever::create(action));
 }
 
+void Player::becomeIdle() {
+    playerSprite->stopAllActions();
+    Animation* anim;
+    if (direction == UP) {
+        anim = AnimationCache::getInstance()->getAnimation("idleUpAnimation");
+    }
+    else if (direction == DOWN) {
+        anim = AnimationCache::getInstance()->getAnimation("idleDownAnimation");
+    }
+    else if (direction == LEFT) {
+        anim = AnimationCache::getInstance()->getAnimation("idleLeftAnimation");
+    }
+    else {
+        anim = AnimationCache::getInstance()->getAnimation("idleRightAnimation");
+    }
+    // auto sf = anim->getFrames().at(0)->getSpriteFrame();
+    auto action = Animate::create(anim);
+    playerSprite->runAction(RepeatForever::create(action));
+}
+
 Monster::Monster()
 {   
     int random;
@@ -177,13 +197,13 @@ void Monster::setMonsterSprite()
 {
     if (_name == "Charmander")
     {
-        monsterSprite = cocos2d::Sprite::create("pokemon/enemy.png", Rect(32, 0, 32, 32));
+        monsterSprite = Utils::createSprite("pokemon/enemy.png", Rect(32, 0, 32, 32));
     }
     else if (_name == "Charmeleon") {
-        monsterSprite = cocos2d::Sprite::create("pokemon/enemy.png", Rect(32, 128, 32, 32));
+        monsterSprite = Utils::createSprite("pokemon/enemy.png", Rect(32, 128, 32, 32));
     }
     else if (_name == "Charizard") {
-        monsterSprite = cocos2d::Sprite::create("pokemon/enemy.png", Rect(32, 256, 32, 32));
+        monsterSprite = Utils::createSprite("pokemon/enemy.png", Rect(32, 256, 32, 32));
     }
 }
 
