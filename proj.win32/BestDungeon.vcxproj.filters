@@ -46,6 +46,9 @@
     <ClCompile Include="..\Classes\lifebar.cpp">
       <Filter>src\source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\GameOverScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -75,6 +78,9 @@
     <ClInclude Include="MasterRoom.h" />
     <ClInclude Include="..\Classes\lifebar.h">
       <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameOverScene.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

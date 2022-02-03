@@ -30,11 +30,11 @@ bool MainMenu::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     //Add map
-    auto sprite = Sprite::create("lvl/Map3.png");
+    auto sprite = Sprite::create("main.png");
     sprite->setScale(1.7f,1.25f);
     if (sprite == nullptr)
     {
-        problemLoading("'lvl/Map3.png'");
+        problemLoading("'main.png'");
     }
     else
     {
@@ -46,12 +46,19 @@ bool MainMenu::init()
     }
 
     //Add font
-    auto startLabel = Label::createWithTTF("Start", "fonts/Nosfer__.ttf", 40);
+    auto nameLabel = Label::createWithTTF("Pokemon Dungeon", "fonts/PokemonSolid.ttf", 40);
+    nameLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y + 75));
+    nameLabel->setTextColor(Color4B::BLACK);
+    this->addChild(nameLabel, 0);
+
+    auto startLabel = Label::createWithTTF("Start", "fonts/PokemonSolid.ttf", 40);
     startLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    startLabel->setTextColor(Color4B::BLACK);
     this->addChild(startLabel, 0);
 
-    auto leaveLabel = Label::createWithTTF("Leave", "fonts/Nosfer__.ttf", 40);
-    leaveLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 50));
+    auto leaveLabel = Label::createWithTTF("Leave", "fonts/PokemonSolid.ttf", 40);
+    leaveLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 70));
+    leaveLabel->setTextColor(Color4B::BLACK);
     this->addChild(leaveLabel, 0);
 
     //Detect click on label

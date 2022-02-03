@@ -76,10 +76,16 @@ public:
 	int getDamage() { return dammage; };
 	void setMonsterSprite();
 	cocos2d::Sprite* getMonsterSprite();
+	void createAnimation();
+	void updateAnimation(cocos2d::Sprite* _pokemon, enum Direction direction);
+	void becomeIdle();
+	void setDirection(Direction _direction) { direction = _direction; };
+	Direction getDirection() { return direction; };
 
 protected:
 	std::string _name;
 	int life;
 	int dammage;
 	cocos2d::Sprite* monsterSprite = nullptr;
+	Direction direction;
 };

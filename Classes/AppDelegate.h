@@ -58,6 +58,11 @@ public:
     @param  the pointer of the application
     */
     virtual void applicationWillEnterForeground();
+
+    std::string getFont() { return font; };
+
+protected:
+    std::string font = "fonts/PokemonSolid.ttf";
 };
 
 #endif // _APP_DELEGATE_H_

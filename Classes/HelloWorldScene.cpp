@@ -23,12 +23,14 @@
  ****************************************************************************/
 
 #include "HelloWorldScene.h"
+#include "GameOverScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include <math.h>
 #define PI           3.14159265358979323846  /* possiblement */
 
 USING_NS_CC;
+using namespace std;
 
 Scene* HelloWorld::createScene()
 {
@@ -105,22 +107,26 @@ Vec2 HelloWorld::offSetScreen(Vec2 playerLocation) {
     }
 }
 
-void HelloWorld::setPlayerDirection(float directionAngle) {
+void HelloWorld::setDirection(float directionAngle) {
     if (directionAngle > 45 && directionAngle < 135)
     {
         player.setDirection(UP);
+        pokemon.setDirection(DOWN);
     }
     else if (directionAngle > 135 && directionAngle < 225)
     {
         player.setDirection(LEFT);
+        pokemon.setDirection(RIGHT);
     }
     else if (directionAngle > 225 && directionAngle < 315)
     {
         player.setDirection(DOWN);
+        pokemon.setDirection(UP);
     }
     else
     {
         player.setDirection(RIGHT);
+        pokemon.setDirection(LEFT);
     }
 }
 
@@ -150,6 +156,7 @@ bool HelloWorld::init()
     player.setPlayerSprite("player/player.png", Rect(0, 0, 32, 32));
     auto _player = player.getPlayerSprite();
     _player->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    _player->setScale(1.5f, 1.5f);
     m_intermediateNode->addChild(_player, 1);
 
     // follow the player
@@ -169,15 +176,38 @@ bool HelloWorld::init()
     {
         _charaLife->setPosition(Vec2(16, 35));
         _charaLife->setPercent(100);
-        _charaLife->setScale(1.25, 1.25);
+        _charaLife->setScale(1.5f, 1.5f);
         _player->addChild(_charaLife, 1);
     }
+
+    //Add characters's stat
+    auto _playerAtkSprite = Sprite::create("atk.png");
+    _playerAtkSprite->setScale(0.025f, 0.025f);
+    _playerAtkSprite->setPosition(Vec2(3, 44));
+    _player->addChild(_playerAtkSprite, 1);
+    auto _playerAtk = Label::createWithTTF(to_string(player.getWeaponDamage(player.getWeapon())), "fonts/arial.ttf", 8);
+    _playerAtk->setTextColor(Color4B::BLACK);
+    _playerAtk->setPosition(Vec2(12, 42));
+    _player->addChild(_playerAtk, 1);
+
+    auto _playerDefSprite = Sprite::create("def.png");
+    _playerDefSprite->setScale(0.025f, 0.025f);
+    _playerDefSprite->setPosition(Vec2(23, 44));
+    _player->addChild(_playerDefSprite, 1);
+    auto _playerDef = Label::createWithTTF(to_string(player.getDefense()), "fonts/arial.ttf", 8);
+    _playerDef->setTextColor(Color4B::BLACK);
+    _playerDef->setPosition(Vec2(31, 42));
+    _player->addChild(_playerDef, 1);
 
     //Add pokemon
     pokemon.setMonsterSprite();
     auto _pokemon = pokemon.getMonsterSprite();
     _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
+    _pokemon->setScale(1.5f, 1.5f);
     m_intermediateNode->addChild(_pokemon, 0);
+
+    //Animation of the pokemon
+    pokemon.createAnimation();
 
     //Pokemon's life
     auto _pokeLife = pokeLife->getLifeBar();
@@ -189,20 +219,31 @@ bool HelloWorld::init()
     {
         _pokeLife->setPosition(Vec2(16, 35));
         _pokeLife->setPercent(100);
-        _pokeLife->setScale(1.25, 1.25);
+        _pokeLife->setScale(1.5f, 1.5f);
         _pokemon->addChild(_pokeLife, 0);
     }
+
+    //Add pokemon's stat
+    auto _pokeAtkSprite = Sprite::create("atk.png");
+    _pokeAtkSprite->setScale(0.025f, 0.025f);
+    _pokeAtkSprite->setPosition(Vec2(6, 44));
+    _pokemon->addChild(_pokeAtkSprite, 0);
+    auto _pokeAtk = Label::createWithTTF(to_string(pokemon.getDamage()), "fonts/arial.ttf", 8);
+    _pokeAtk->setTextColor(Color4B::BLACK);
+    _pokeAtk->setPosition(Vec2(15, 42));
+    _pokemon->addChild(_pokeAtk, 0);
 
     //Add pokeball
     pokeball.setTreasureSprite("player/pokeball.png", Rect(0, 0, 16, 24));
     auto _pb = pokeball.getTreasureSprite();
     _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
+    _pb->setScale(1.5f, 1.5f);
     m_intermediateNode->addChild(_pb, 0);
 
     //Add fightButton
     auto fightButton = MenuItemImage::create("fight.png", "fight.png",
         [=](Ref*) {
-            fightPokemon(player, _player, charaLife, pokemon, _pokemon, pokeLife);
+            fightPokemon(_player, _pokemon);
         });
     if (fightButton == nullptr || fightButton->getContentSize().width <= 0 || fightButton->getContentSize().height <= 0) {
         Utils::problemLoading("'fight.png'");
@@ -215,7 +256,7 @@ bool HelloWorld::init()
     //Add pickButton
     auto pickButton = MenuItemImage::create("pick.png", "pick.png",
         [=](Ref*) {
-            pickPockeball(_pb);
+            pickPockeball(_pb, visibleSize, origin);
         });
     if (pickButton == nullptr || pickButton->getContentSize().width <= 0 || pickButton->getContentSize().height <= 0) {
         Utils::problemLoading("'pick.png'");
@@ -248,13 +289,13 @@ bool HelloWorld::init()
 
         Vec2 const pos = touch->getLocation() + offSetScreen(_player->getPosition());  
         MoveTo* move = MoveTo::create(Vec2(pos - _player->getPosition()).length()/player.getPixelSpeed(), pos);
-        setPlayerDirection(fmod(Vec2(_player->getPosition().x - pos.x, _player->getPosition().y - pos.y).getAngle() * 180 / PI + 180, 360));
+        setDirection(fmod(Vec2(_player->getPosition().x - pos.x, _player->getPosition().y - pos.y).getAngle() * 180 / PI + 180, 360));
         player.updateAnimation(_player, player.getDirection());
         
         auto playerStop = [=]() {
             player.becomeIdle();
 
-            if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox())) {
+            if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox()) && !pokeball.isOpen()) {
                 float x = origin.x + visibleSize.width - pickButton->getContentSize().width / 20;
                 float y = origin.y + pickButton->getContentSize().height / 20;
                 pickButton->setPosition(Vec2(x, y) + offSetScreen(pos));
@@ -288,25 +329,80 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::fightPokemon(Player _player, cocos2d::Sprite* _pl, LifeBar* _charaLife, Monster _pokemon, cocos2d::Sprite* _pk, LifeBar* _pokeLife) {
-    _pokemon.receiveDammage(_player.getWeaponDamage(_player.getWeapon()));
-    _pokeLife->updateLife(_player.getWeaponDamage(_player.getWeapon()));
-    if (_pokeLife->getLife() != 0) {
-        _player.receiveDammage(_pokemon.getDamage());
-        _charaLife->updateLife(_pokemon.getDamage());
-        if (_charaLife->getLife() == 0) {
-            m_intermediateNode->removeChild(_pl);
+void HelloWorld::fightPokemon(Sprite* _player , Sprite* _pk) {
+    player.updateAnimation(_player, player.getDirection());
+    pokemon.updateAnimation(_pk, pokemon.getDirection());
+    Vec2 playerPos = _player->getPosition();
+    Vec2 pokemonPos = _pk->getPosition();
+    MoveTo* move1 = MoveTo::create(Vec2(pokemonPos - playerPos).length() / player.getPixelSpeed(), Vec2((playerPos.x + pokemonPos.x) / 2, (playerPos.y + pokemonPos.y) / 2));
+    MoveTo* move2 = MoveTo::create(Vec2(playerPos - pokemonPos).length() / player.getPixelSpeed(), Vec2((playerPos.x + pokemonPos.x) / 2, (playerPos.y + pokemonPos.y) / 2));
+    auto idlePlayer = [=]() {
+        player.becomeIdle();
+        _player->setPosition(playerPos);
+    };
+    auto idlePokemon = [=]() {
+        pokemon.becomeIdle();
+        _pk->setPosition(pokemonPos);
+        pokemon.receiveDammage(player.getWeaponDamage(player.getWeapon()));
+        pokeLife->updateLife(player.getWeaponDamage(player.getWeapon()));
+        if (pokeLife->getLife() != 0) {
+            player.receiveDammage(pokemon.getDamage());
+            charaLife->updateLife(pokemon.getDamage());
+            if (charaLife->getLife() <= 0) {
+                auto director = Director::getInstance();
+                auto scene = GameOver::createScene();
+                director->replaceScene(scene);
+            }
         }
-    }
-    else {
-        m_intermediateNode->removeChild(_pk);
-    }
+        else {
+            m_intermediateNode->removeChild(_pk);
+        }
+    };
+    CallFunc* becomeIdlePlayer = CallFunc::create(idlePlayer);
+    Sequence* attackPlayer = Sequence::create({ move1, becomeIdlePlayer});
+    _player->runAction(attackPlayer);
+    CallFunc* becomeIdlePokemon = CallFunc::create(idlePokemon);
+    Sequence* attackPokemon = Sequence::create({ move2, becomeIdlePokemon }); 
+    _pk->runAction(attackPokemon);
 }
 
-void HelloWorld::pickPockeball(Sprite* _pb) {
+void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
     if (!pokeball.isOpen()) {
+        player.setGold(pokeball.getGoldNumber());
         pokeball.setOpen(true);
-        _pb->setTexture("player/pokeball.png");
-        _pb->setTextureRect(Rect(32, 0, 16, 24));
+        auto anim = [=] {
+            Animation* openAnimation = Animation::create();
+            for (int i = 0; i < 3; i++)
+            {
+                openAnimation->addSpriteFrame(SpriteFrame::create("player/pokeball.png", Rect(i * 16, 0, 16, 24)));
+            }
+            openAnimation->setDelayPerUnit(0.25);
+            auto sf = openAnimation->getFrames().at(0)->getSpriteFrame();
+            auto action = Animate::create(openAnimation);
+            _pb->runAction(action);
+        };
+        auto timer1 = DelayTime::create(0.75);
+        static Label* amount;
+        static Sprite* dollard;
+        auto showPKD = [=] {
+            amount = Label::createWithTTF("+" + to_string(pokeball.getGoldNumber()), "fonts/arial.ttf", 14);
+            amount->setPosition(Vec2(_size.width / 2 + _origin.x + 40, _size.height / 1.25 + _origin.y + 24));
+            amount->setTextColor(Color4B::BLACK);
+            m_intermediateNode->addChild(amount, 0);
+            dollard = Sprite::create("tresure.png");
+            dollard->setScale(0.1f, 0.1f);
+            dollard->setPosition(Vec2(_size.width / 2 + _origin.x + 56, _size.height / 1.25 + _origin.y + 24));
+            m_intermediateNode->addChild(dollard, 1);
+        };
+        auto timer2 = DelayTime::create(2);
+        auto hidePKD = [=] {
+            m_intermediateNode->removeChild(amount);
+            m_intermediateNode->removeChild(dollard);
+        };
+        CallFunc* open = CallFunc::create(anim);
+        CallFunc* show = CallFunc::create(showPKD);
+        CallFunc* hide = CallFunc::create(hidePKD);
+        Sequence* getPKD = Sequence::create({ open, timer1, show, timer2, hide });
+        runAction(getPKD);
     }
 }
