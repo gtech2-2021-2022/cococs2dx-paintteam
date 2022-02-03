@@ -249,6 +249,7 @@ bool HelloWorld::init()
         Utils::problemLoading("'fight.png'");
     }
     auto fight = Menu::create(fightButton, NULL);
+    fight->setName("ok");
     fight->setPosition(Vec2::ZERO);
     fight->setVisible(false);
     m_intermediateNode->addChild(fight, 1);
@@ -286,15 +287,13 @@ bool HelloWorld::init()
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
         fight->setVisible(false);
         pick->setVisible(false);
-
-        Vec2 const pos = touch->getLocation() + offSetScreen(_player->getPosition());  
-        MoveTo* move = MoveTo::create(Vec2(pos - _player->getPosition()).length()/player.getPixelSpeed(), pos);
+        Vec2 const pos = touch->getLocation() + offSetScreen(_player->getPosition());
+        MoveTo* move = MoveTo::create(Vec2(pos - _player->getPosition()).length() / player.getPixelSpeed(), pos);
         setDirection(fmod(Vec2(_player->getPosition().x - pos.x, _player->getPosition().y - pos.y).getAngle() * 180 / PI + 180, 360));
         player.updateAnimation(_player, player.getDirection());
-        
         auto playerStop = [=]() {
             player.becomeIdle();
-
+            CocosDenshion::SimpleAudioEngine::getInstance()->stopEffect(CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/walk/walk1.wav"));
             if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox()) && !pokeball.isOpen()) {
                 float x = origin.x + visibleSize.width - pickButton->getContentSize().width / 20;
                 float y = origin.y + pickButton->getContentSize().height / 20;
@@ -311,8 +310,9 @@ bool HelloWorld::init()
             }
         };
         CallFunc* becomeIdle = CallFunc::create(playerStop);
-        move->setTag(movementTag);
-
+        //move->setTag(movementTag);
+        CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/walk/walk1.wav");
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/walk/walk1.wav", true);
         Sequence* moveThenIdle = Sequence::create({move, becomeIdle});
 
         if (_player->getNumberOfRunningActions() == 0) {
@@ -355,8 +355,9 @@ void HelloWorld::fightPokemon(Sprite* _player , Sprite* _pk) {
             }
         }
         else {
-            m_intermediateNode->removeChild(_pk);
-        }
+            m_intermediateNode->removeChild(_pk);        }
+        CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/damage/uuuu.wav");
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/damage/uuuu.wav");
     };
     CallFunc* becomeIdlePlayer = CallFunc::create(idlePlayer);
     Sequence* attackPlayer = Sequence::create({ move1, becomeIdlePlayer});
@@ -393,6 +394,8 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
             dollard->setScale(0.1f, 0.1f);
             dollard->setPosition(Vec2(_size.width / 2 + _origin.x + 56, _size.height / 1.25 + _origin.y + 24));
             m_intermediateNode->addChild(dollard, 1);
+            CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/tresure/coins2.wav");
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/tresure/coins2.wav");
         };
         auto timer2 = DelayTime::create(2);
         auto hidePKD = [=] {
