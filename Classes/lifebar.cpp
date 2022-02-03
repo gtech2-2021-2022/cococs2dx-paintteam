@@ -7,11 +7,15 @@ LifeBar::LifeBar(int _life)
 {
 	lifeMax = _life;
 	life = _life;
-	bar = ui::LoadingBar::create("life.png");
+	bar = ProgressTimer::create(Sprite::create("life.png"));
+	bar->setType(ProgressTimer::Type::BAR);
+	bar->setBarChangeRate(Vec2(1, 0));
+	bar->setMidpoint(Vec2(0, 0.5f));
+	bar->setPercentage(100);
 }
 
 void LifeBar::updateLife(int dammage)
 {
 	life -= dammage;
-	bar->setPercent(life / lifeMax * 100);
+	bar->setPercentage(life / lifeMax * 100);
 }

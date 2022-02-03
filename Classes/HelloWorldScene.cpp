@@ -25,7 +25,6 @@
 #include "HelloWorldScene.h"
 #include "GameOverScene.h"
 #include "SimpleAudioEngine.h"
-#include "ui/CocosGUI.h"
 #include <math.h>
 #define PI           3.14159265358979323846  /* possiblement */
 
@@ -175,8 +174,7 @@ bool HelloWorld::init()
     else
     {
         _charaLife->setPosition(Vec2(16, 35));
-        _charaLife->setPercent(100);
-        _charaLife->setScale(1.5f, 1.5f);
+        log("%f", _charaLife->getScale());
         _player->addChild(_charaLife, 1);
     }
 
@@ -219,8 +217,7 @@ bool HelloWorld::init()
     else
     {
         _pokeLife->setPosition(Vec2(16, 35));
-        _pokeLife->setPercent(100);
-        _pokeLife->setScale(1.5f, 1.5f);
+        log("%f", _pokeLife->getScale());
         _pokemon->addChild(_pokeLife, 0);
     }
 
@@ -362,9 +359,11 @@ void HelloWorld::fightPokemon(Sprite* _player , Sprite* _pk) {
             m_intermediateNode->removeChild(_pk);
             Node* _button = m_intermediateNode->getChildByName("fight");
             _button->setVisible(false);
+            player.setGold(pokemon.getGold());
         }
         CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/damage/uuuu.wav");
         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/damage/uuuu.wav");
+        
     };
     CallFunc* becomeIdlePlayer = CallFunc::create(idlePlayer);
     Sequence* attackPlayer = Sequence::create({ move1, becomeIdlePlayer});

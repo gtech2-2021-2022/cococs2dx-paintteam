@@ -81,6 +81,7 @@ public:
 	void becomeIdle();
 	void setDirection(Direction _direction) { direction = _direction; };
 	Direction getDirection() { return direction; };
+	int getGold() { return gold; };
 
 protected:
 	std::string _name;
@@ -88,4 +89,5 @@ protected:
 	int dammage;
 	cocos2d::Sprite* monsterSprite = nullptr;
 	Direction direction;
+	int gold;
 };

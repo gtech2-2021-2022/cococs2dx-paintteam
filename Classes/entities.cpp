@@ -168,16 +168,19 @@ Monster::Monster()
         _name = "Charmander";
         life = 50;
         dammage = 10;
+        gold = 1;
     }
     else if (random == 2) {
         _name = "Charmeleon";
         life = 100;
         dammage = 20;
+        gold = 2;
     }
     else if (random == 3) {
         _name = "Charizard";
         life = 150;
         dammage = 30;
+        gold = 3;
     }
 }
 

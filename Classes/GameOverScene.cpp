@@ -23,6 +23,7 @@ bool GameOver::init()
 {
     //////////////////////////////
     // 1. super init first
+    Director::getInstance()->purgeCachedData();
     if (!Scene::init())
     {
         return false;
