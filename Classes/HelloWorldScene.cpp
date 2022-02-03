@@ -204,6 +204,7 @@ bool HelloWorld::init()
     auto _pokemon = pokemon.getMonsterSprite();
     _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
     _pokemon->setScale(1.5f, 1.5f);
+    _pokemon->setName("pokemon");
     m_intermediateNode->addChild(_pokemon, 0);
 
     //Animation of the pokemon
@@ -249,9 +250,9 @@ bool HelloWorld::init()
         Utils::problemLoading("'fight.png'");
     }
     auto fight = Menu::create(fightButton, NULL);
-    fight->setName("ok");
     fight->setPosition(Vec2::ZERO);
     fight->setVisible(false);
+    fight->setName("fight");
     m_intermediateNode->addChild(fight, 1);
 
     //Add pickButton
@@ -265,6 +266,7 @@ bool HelloWorld::init()
     auto pick = Menu::create(pickButton, NULL);
     pick->setPosition(Vec2::ZERO);
     pick->setVisible(false);
+    pick->setName("pick");
     m_intermediateNode->addChild(pick, 1);
     
     //Add MapButton
@@ -301,12 +303,14 @@ bool HelloWorld::init()
                 pickButton->setScale(0.1f, 0.1f);
                 pick->setVisible(true);
             }
-            if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
-                float x = origin.x + visibleSize.width - fightButton->getContentSize().width / 20;
-                float y = origin.y + fightButton->getContentSize().height / 20;
-                fightButton->setPosition(Vec2(x, y) + offSetScreen(pos));
-                fightButton->setScale(0.1f, 0.1f);
-                fight->setVisible(true);
+            if (m_intermediateNode->getChildByName("pokemon")) {
+                if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
+                    float x = origin.x + visibleSize.width - fightButton->getContentSize().width / 20;
+                    float y = origin.y + fightButton->getContentSize().height / 20;
+                    fightButton->setPosition(Vec2(x, y) + offSetScreen(pos));
+                    fightButton->setScale(0.1f, 0.1f);
+                    fight->setVisible(true);
+                }
             }
         };
         CallFunc* becomeIdle = CallFunc::create(playerStop);
@@ -355,7 +359,10 @@ void HelloWorld::fightPokemon(Sprite* _player , Sprite* _pk) {
             }
         }
         else {
-            m_intermediateNode->removeChild(_pk);        }
+            m_intermediateNode->removeChild(_pk);
+            Node* _button = m_intermediateNode->getChildByName("fight");
+            _button->setVisible(false);
+        }
         CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/damage/uuuu.wav");
         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/damage/uuuu.wav");
     };
@@ -396,6 +403,8 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
             m_intermediateNode->addChild(dollard, 1);
             CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/tresure/coins2.wav");
             CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/tresure/coins2.wav");
+            Node* _button = m_intermediateNode->getChildByName("pick");
+            _button->setVisible(false);
         };
         auto timer2 = DelayTime::create(2);
         auto hidePKD = [=] {
