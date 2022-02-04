@@ -66,7 +66,7 @@ void Player::createAnimation() {
     {
         walkUpAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 32, 32, 32)));
     }
-    walkUpAnimation->setDelayPerUnit(0.25);
+    walkUpAnimation->setDelayPerUnit(0.16);
     AnimationCache::getInstance()->addAnimation(walkUpAnimation, "walkUpAnimation");
 
     Animation* walkDownAnimation = Animation::create();
@@ -74,7 +74,7 @@ void Player::createAnimation() {
     {
         walkDownAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 0, 32, 32)));
     }
-    walkDownAnimation->setDelayPerUnit(0.25);
+    walkDownAnimation->setDelayPerUnit(0.16);
     AnimationCache::getInstance()->addAnimation(walkDownAnimation, "walkDownAnimation");
 
     Animation* walkLeftAnimation = Animation::create();
@@ -82,7 +82,7 @@ void Player::createAnimation() {
     {
         walkLeftAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 64, 32, 32)));
     }
-    walkLeftAnimation->setDelayPerUnit(0.25);
+    walkLeftAnimation->setDelayPerUnit(0.16);
     AnimationCache::getInstance()->addAnimation(walkLeftAnimation, "walkLeftAnimation");
 
     Animation* walkRightAnimation = Animation::create();
@@ -90,7 +90,7 @@ void Player::createAnimation() {
     {
         walkRightAnimation->addSpriteFrame(SpriteFrame::create("player/player.png", Rect(i * 32, 96, 32, 32)));
     }
-    walkRightAnimation->setDelayPerUnit(0.25);
+    walkRightAnimation->setDelayPerUnit(0.16);
     AnimationCache::getInstance()->addAnimation(walkRightAnimation, "walkRightAnimation");
 
     Animation* idleUpAnimation = Animation::create();

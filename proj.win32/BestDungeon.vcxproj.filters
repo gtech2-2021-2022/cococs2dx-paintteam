@@ -42,8 +42,10 @@
     <ClCompile Include="..\Classes\MainMenuScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="MasterRoom.cpp" />
     <ClCompile Include="..\Classes\lifebar.cpp">
+      <Filter>src\source</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawnMap.cpp">
       <Filter>src\source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,8 +74,10 @@
     <ClInclude Include="..\Classes\MainMenuScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="MasterRoom.h" />
     <ClInclude Include="..\Classes\lifebar.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawnMap.h">
       <Filter>src\header</Filter>
     </ClInclude>
   </ItemGroup>

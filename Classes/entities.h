@@ -47,6 +47,8 @@ public:
 	Direction getDirection() { return direction;  };
 	const float getPixelSpeed() noexcept { return pixelPerSecond; };
 	void becomeIdle();
+	void changeCanMove() { move = !move; }
+	bool canMove() { return move; }
 
 protected:
 	std::string _name;
@@ -62,6 +64,7 @@ protected:
 	cocos2d::Sprite* playerSprite = nullptr;
 	Direction direction;
 	float const pixelPerSecond = 115;
+	bool move = true;
 	
 };
 

@@ -42,10 +42,12 @@ private:
     Treasure pokeball;
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;
+    cocos2d::CCTMXLayer* m_doorsLayer;
     cocos2d::Node* m_intermediateNode;
-    // MapHandler m_mapHandler;
+    MapHandler m_mapHandler;
     float m_mapRatio = 1;
-    float m_mapButtonRatio = 0.2f;
+    cocos2d::Sprite* m_mapDraw;
+    
 
 
 
@@ -53,7 +55,6 @@ public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
-    
     cocos2d::Size setTileMap();
     cocos2d::Vec2 offSetScreen(cocos2d::Vec2 playerLocation);
     float compareToOffset(float player, float screen, float tileMap);
@@ -62,9 +63,13 @@ public:
 
     void fightPokemon(Player _player, cocos2d::Sprite* _pl, LifeBar* _charaLife, Monster _pokemon, cocos2d::Sprite* _pk, LifeBar* _pokeLife);
     void pickPockeball(cocos2d::Sprite* _pb);
+    void makeMapAppear();
+    void makeMapDissapear();
     
+    bool isOnDoorTile(cocos2d::Vec2);
 
-
+    bool changeRoom(cocos2d::Vec2);
+    void updateRoom();
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 
