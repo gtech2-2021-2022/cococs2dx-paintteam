@@ -144,9 +144,18 @@ void MapHandler::createMapAndDraw(int xpos, int ypos) {
 				}
 				if (x == xpos && y == ypos) {
 					m_sprite->addChild(Utils::createElement(m_elements.player, coords));
-				} else if(_room[y][x].hasMonster()) {
+					Node* head = m_sprite->getChildByName(m_elements.player.name);
+					auto changeVisibility = [=]() {
+						head->setVisible(!head->isVisible());
+					};
+					DelayTime* wait = DelayTime::create(0.5f);
+					CallFunc* Visibility = CallFunc::create(changeVisibility);
+					Sequence* FadeAndDisappear = Sequence::create({ wait, Visibility });
+					RepeatForever* cycle = RepeatForever::create(FadeAndDisappear);
+					head->runAction(cycle);
+				} /*else if (_room[y][x].hasMonster()) {
 					m_sprite->addChild(Utils::createElement(m_elements.enemy, coords));
-				}
+				}*/
 			}
 			tag++;
 		}
