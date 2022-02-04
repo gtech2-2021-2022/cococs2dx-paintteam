@@ -85,6 +85,10 @@ public:
 	void setDirection(Direction _direction) { direction = _direction; };
 	Direction getDirection() { return direction; };
 	int getGold() { return gold; };
+	void setName(std::string name) { _name = name; };
+	cocos2d::Rect getTextureRect();
+	void setDamage(int _dmg) { dammage = _dmg; };
+	void setLife(int _life) { life = _life; };
 
 protected:
 	std::string _name;

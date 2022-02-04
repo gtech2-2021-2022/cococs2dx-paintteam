@@ -19,3 +19,8 @@ void LifeBar::updateLife(int dammage)
 	life -= dammage;
 	bar->setPercentage(life / lifeMax * 100);
 }
+
+void LifeBar::setLife(int _life) {
+	lifeMax = _life;
+	life = _life;
+}

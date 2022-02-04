@@ -38,8 +38,16 @@ private:
     Player player;
     LifeBar* charaLife = new LifeBar(player.getLife());
     Monster pokemon;
+    cocos2d::Sprite* _pokemon;
     LifeBar* pokeLife = new LifeBar(pokemon.getLife());
     Treasure pokeball;
+    cocos2d::Sprite* _pb;
+    Weapon weapon = Weapon("Hands", 10);
+    cocos2d::Sprite* _weapon;
+    Armor helmet = Armor("", 0, Type::HELMET);
+    Armor chestplate = Armor("", 0, Type::CHESTPLATE);
+    Armor legging = Armor("", 0, Type::LEGGING);
+    Armor boots = Armor("", 0, Type::BOOTS);
     cocos2d::CCTMXTiledMap* m_tileMap;
     cocos2d::CCTMXLayer* m_collisions;
     cocos2d::CCTMXLayer* m_doorsLayer;
@@ -63,6 +71,7 @@ public:
 
     void fightPokemon(cocos2d::Sprite* _player, cocos2d::Sprite* _pk);
     void pickPockeball(cocos2d::Sprite* _pb, cocos2d::Size _size, cocos2d::Vec2 _origin);
+    void pickWeapon(cocos2d::Label* _wpAtk);
     
     void makeMapAppear();
     void makeMapDissapear();
@@ -70,7 +79,7 @@ public:
     bool isOnDoorTile(cocos2d::Vec2);
 
     bool changeRoom(cocos2d::Vec2);
-    void updateRoom();
+    void updateRoom(cocos2d::Label* _playerAtk, cocos2d::Label* _pokeAtk);
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 

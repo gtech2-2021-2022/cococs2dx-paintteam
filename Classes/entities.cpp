@@ -5,7 +5,7 @@ using namespace cocos2d;
 
 Player::Player() : life(100) 
 {
-    _weapon = new Weapon("Stone Sword", 10);
+    _weapon = new Weapon("Hands", 10);
 }
 
 void Player::receiveDammage(int nbDammage)
@@ -206,6 +206,19 @@ void Monster::setMonsterSprite()
     }
     else if (_name == "Charizard") {
         monsterSprite = Utils::createSprite("pokemon/enemy.png", Rect(32, 256, 32, 32));
+    }
+}
+
+Rect Monster::getTextureRect() {
+    if (_name == "Charmander")
+    {
+        return Rect(32, 0, 32, 32);
+    }
+    else if (_name == "Charmeleon") {
+        return Rect(32, 128, 32, 32);
+    }
+    else if (_name == "Charizard") {
+        return Rect(32, 256, 32, 32);
     }
 }
 

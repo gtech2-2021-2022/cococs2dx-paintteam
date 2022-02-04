@@ -53,6 +53,7 @@ public:
 	void generateWeapon(Weapon *weapon);
 	std::string getWeaponName();
 	void takeWeapon(Player &player);
+	Weapon* getWeapon() { return _weapon; };
 	void generateArmor(Armor* weapon);
 	std::string getArmorName(Armor* armor);
 	Armor* getHelmet() { return helmet; };
@@ -63,6 +64,7 @@ public:
 	void generateMonster();
 	void deleteMonster();
 	Monster* getMonster() { return monster;  };
+	Treasure* getTreasure() { return treasure; };
 
 
 protected:
@@ -145,4 +147,14 @@ public:
 	cocos2d::Sprite* setDoorSprite(cocos2d::CCTMXTiledMap* parent, cocos2d::Rect imageRescale);
 	void placeDoors(cocos2d::CCTMXTiledMap* map);
 	void updateDoors(int xpos, int ypos);
+	bool roomHasMonster(int x, int y) { return _room[y][x].hasMonster(); };
+	bool roomHasTreasure(int x, int y) { return _room[y][x].hasTreasure(); };
+	bool roomHasHelmet(int x, int y) { return _room[y][x].hasHelmet(); };
+	bool roomHasChestplate(int x, int y) { return _room[y][x].hasChestplate(); };
+	bool roomHasLegging(int x, int y) { return _room[y][x].hasLegging(); };
+	bool roomHasBoots(int x, int y) { return _room[y][x].hasBoots(); };
+	bool roomHasWeapon(int x, int y) { return _room[y][x].hasWeapon(); };
+	Monster* getMonster(int x, int y) { return _room[y][x].getMonster(); };
+	Treasure* getTreasure(int x, int y) { return _room[y][x].getTreasure(); };
+	Weapon* getWeapon(int x, int y) { return _room[y][x].getWeapon(); };
 };

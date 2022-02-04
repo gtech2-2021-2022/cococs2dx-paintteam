@@ -10,7 +10,9 @@ public:
 	LifeBar(int _life);
 	cocos2d::ProgressTimer* getLifeBar() { return bar; };
 	void updateLife(int dammage);
+	int getMaxLife() { return lifeMax; };
 	int getLife() { return life; };
+	void setLife(int _life);
 
 protected:
 	float lifeMax = 0;

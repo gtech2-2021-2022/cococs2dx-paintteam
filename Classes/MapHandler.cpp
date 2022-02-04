@@ -41,9 +41,9 @@ MapHandler::MapHandler()
 		playerX = rand() % 5;
 		playerY = rand() % 5;
 	} while (_room[playerY][playerX].isRoomExisting() != true);
-	_weapons.push_back(Weapon("Golden Sword", 20));
-	_weapons.push_back(Weapon("Iron Sword", 30));
-	_weapons.push_back(Weapon("Diamond Sword", 40));
+	_weapons.push_back(Weapon("Squirtle", 20));
+	_weapons.push_back(Weapon("Wartortle", 30));
+	_weapons.push_back(Weapon("Blastoise", 40));
 	_armors.push_back(Armor("Golden Helmet", 2, Type::HELMET));
 	_armors.push_back(Armor("Golden Chestplate", 2, Type::CHESTPLATE));
 	_armors.push_back(Armor("Golden Legging", 2, Type::LEGGING));

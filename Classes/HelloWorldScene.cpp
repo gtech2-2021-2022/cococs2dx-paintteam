@@ -228,10 +228,11 @@ bool HelloWorld::init()
 
     //Add pokemon
     pokemon.setMonsterSprite();
-    auto _pokemon = pokemon.getMonsterSprite();
+    _pokemon = pokemon.getMonsterSprite();
     _pokemon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
     _pokemon->setScale(1.5f, 1.5f);
     _pokemon->setName("pokemon");
+    _pokemon->setVisible(false);
     m_intermediateNode->addChild(_pokemon, 0);
 
     //Animation of the pokemon
@@ -246,7 +247,6 @@ bool HelloWorld::init()
     else
     {
         _pokeLife->setPosition(Vec2(16, 35));
-        log("%f", _pokeLife->getScale());
         _pokemon->addChild(_pokeLife, 0);
     }
 
@@ -262,10 +262,19 @@ bool HelloWorld::init()
 
     //Add pokeball
     pokeball.setTreasureSprite("player/pokeball.png", Rect(0, 0, 16, 24));
-    auto _pb = pokeball.getTreasureSprite();
-    _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x + 50, visibleSize.height / 1.25 + origin.y));
+    _pb = pokeball.getTreasureSprite();
+    _pb->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
     _pb->setScale(1.5f, 1.5f);
+    _pb->setName("pokeball");
+    _pb->setVisible(false);
     m_intermediateNode->addChild(_pb, 0);
+
+    //Add weapon
+    weapon.setWeaponSprite("pokemon/carapuce.png", Rect(0, 0, 26, 26));
+    _weapon = weapon.getWeaponSprite();
+    _weapon->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 1.25 + origin.y));
+    _weapon->setVisible(false);
+    m_intermediateNode->addChild(_weapon, 0);
 
     //Add fightButton
     auto fightButton = MenuItemImage::create("fight.png", "fight.png",
@@ -294,6 +303,20 @@ bool HelloWorld::init()
     pick->setVisible(false);
     pick->setName("pick");
     m_intermediateNode->addChild(pick, 1);
+
+    //Add pickButton
+    auto stuffButton = MenuItemImage::create("pick.png", "pick.png",
+        [=](Ref*) {
+            pickWeapon(_playerAtk);
+        });
+    if (stuffButton == nullptr || stuffButton->getContentSize().width <= 0 || stuffButton->getContentSize().height <= 0) {
+        Utils::problemLoading("'pick.png'");
+    }
+    auto stuff = Menu::create(stuffButton, NULL);
+    stuff->setPosition(Vec2::ZERO);
+    stuff->setVisible(false);
+    stuff->setName("stuff");
+    m_intermediateNode->addChild(stuff, 1);
     
     //Add MapButton
     auto mapButton = MenuItemImage::create("map.png", "mapSelected.png",
@@ -321,7 +344,7 @@ bool HelloWorld::init()
             log("both on tile");
             if (changeRoom(touch->getLocation() + offSetScreen(_player->getPosition()))) {
                 log("Changed room");
-                updateRoom();
+                updateRoom(_playerAtk, _pokeAtk);
                 return true;
             }
         }
@@ -335,20 +358,35 @@ bool HelloWorld::init()
         auto playerStop = [=]() {
             player.becomeIdle();
             CocosDenshion::SimpleAudioEngine::getInstance()->stopEffect(CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/walk/walk1.wav"));
-            if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox()) && !pokeball.isOpen()) {
-                float x = origin.x + visibleSize.width - pickButton->getContentSize().width / 20;
-                float y = origin.y + pickButton->getContentSize().height / 20;
-                pickButton->setPosition(Vec2(x, y) + offSetScreen(pos));
-                pickButton->setScale(0.1f, 0.1f);
-                pick->setVisible(true);
+            if (m_intermediateNode->getChildByName("pokeball") && _pb->isVisible())
+            {
+                if (_player->getBoundingBox().intersectsRect(_pb->getBoundingBox()) && !pokeball.isOpen()) {
+                    float x = origin.x + visibleSize.width - pickButton->getContentSize().width / 20;
+                    float y = origin.y + pickButton->getContentSize().height / 20;
+                    pickButton->setPosition(Vec2(x, y) + offSetScreen(pos));
+                    pickButton->setScale(0.1f, 0.1f);
+                    pick->setVisible(true);
+                }
             }
-            if (m_intermediateNode->getChildByName("pokemon")) {
+            
+            if (m_intermediateNode->getChildByName("pokemon") && _pokemon->isVisible()) {
                 if (_player->getBoundingBox().intersectsRect(_pokemon->getBoundingBox())) {
                     float x = origin.x + visibleSize.width - fightButton->getContentSize().width / 20;
                     float y = origin.y + fightButton->getContentSize().height / 20;
                     fightButton->setPosition(Vec2(x, y) + offSetScreen(pos));
                     fightButton->setScale(0.1f, 0.1f);
                     fight->setVisible(true);
+                }
+            }
+
+            if (m_intermediateNode->getChildByName("stuff") && _weapon->isVisible())
+            {
+                if (_player->getBoundingBox().intersectsRect(_weapon->getBoundingBox())) {
+                    float x = origin.x + visibleSize.width - fightButton->getContentSize().width / 20;
+                    float y = origin.y + fightButton->getContentSize().height / 20;
+                    stuffButton->setPosition(Vec2(x, y) + offSetScreen(pos));
+                    stuffButton->setScale(0.1f, 0.1f);
+                    stuff->setVisible(true);
                 }
             }
         };
@@ -388,6 +426,8 @@ void HelloWorld::fightPokemon(Sprite* _player , Sprite* _pk) {
         _pk->setPosition(pokemonPos);
         pokemon.receiveDammage(player.getWeaponDamage(player.getWeapon()));
         pokeLife->updateLife(player.getWeaponDamage(player.getWeapon()));
+        auto pk = m_mapHandler.getMonster(player.getPlayerX(), player.getPlayerY());
+        pk->setLife(pokemon.getLife());
         if (pokeLife->getLife() != 0) {
             player.receiveDammage(pokemon.getDamage());
             charaLife->updateLife(pokemon.getDamage());
@@ -415,10 +455,10 @@ void HelloWorld::fightPokemon(Sprite* _player , Sprite* _pk) {
     _pk->runAction(attackPokemon);
 }
 
-void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
+void HelloWorld::pickPockeball(Sprite* _pb,Size _size, Vec2 _origin) {
     if (!pokeball.isOpen()) {
-        player.setGold(pokeball.getGoldNumber());
-        pokeball.setOpen(true);
+        auto pb = m_mapHandler.getTreasure(player.getPlayerX(), player.getPlayerY());
+        pb->setOpen(true);
         auto anim = [=] {
             Animation* openAnimation = Animation::create();
             for (int i = 0; i < 3; i++)
@@ -434,18 +474,19 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
         static Label* amount;
         static Sprite* dollard;
         auto showPKD = [=] {
-            amount = Label::createWithTTF("+" + to_string(pokeball.getGoldNumber()), "fonts/arial.ttf", 14);
-            amount->setPosition(Vec2(_size.width / 2 + _origin.x + 40, _size.height / 1.25 + _origin.y + 24));
+            amount = Label::createWithTTF("+" + to_string(pokeball.getGoldNumber()), "fonts/PokemonSolid.ttf", 14);
+            amount->setPosition(Vec2(_size.width / 2 + _origin.x - 10, _size.height / 1.25 + _origin.y + 24));
             amount->setTextColor(Color4B::BLACK);
             m_intermediateNode->addChild(amount, 0);
             dollard = Sprite::create("tresure.png");
             dollard->setScale(0.1f, 0.1f);
-            dollard->setPosition(Vec2(_size.width / 2 + _origin.x + 56, _size.height / 1.25 + _origin.y + 24));
+            dollard->setPosition(Vec2(_size.width / 2 + _origin.x + 5, _size.height / 1.25 + _origin.y + 24));
             m_intermediateNode->addChild(dollard, 1);
             CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("sounds/tresure/coins2.wav");
             CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("sounds/tresure/coins2.wav");
             Node* _button = m_intermediateNode->getChildByName("pick");
             _button->setVisible(false);
+            player.setGold(pokeball.getGoldNumber());
         };
         auto timer2 = DelayTime::create(2);
         auto hidePKD = [=] {
@@ -457,6 +498,19 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
         CallFunc* hide = CallFunc::create(hidePKD);
         Sequence* getPKD = Sequence::create({ open, timer1, show, timer2, hide });
         runAction(getPKD);
+    }
+}
+
+void HelloWorld::pickWeapon(Label* _wpAtk) {
+    if (m_mapHandler.roomHasWeapon(player.getPlayerX(), player.getPlayerY()))
+    {
+        auto wp = m_mapHandler.getWeapon(player.getPlayerX(), player.getPlayerY());
+        player.setWeapon(wp);
+        _wpAtk->setString(to_string(wp->getDammage()));
+        weapon.setTake(true);
+        _weapon->setVisible(false);
+        Node* _button = m_intermediateNode->getChildByName("stuff");
+        _button->setVisible(false);
     }
 }
 
@@ -523,7 +577,6 @@ bool HelloWorld::changeRoom(Vec2 pos) {
     Vec2 middle = m_tileMap->getContentSize()/2.f * m_mapRatio;
     setDirection(fmod(Vec2(middle.x - pos.x, middle.y - pos.y).getAngle() * 180 / PI + 180, 360));
     int direction = player.getDirection();
-    
     switch (direction)
     {
     case Direction::UP:
@@ -562,8 +615,58 @@ bool HelloWorld::changeRoom(Vec2 pos) {
     return false;
 }
 
-void HelloWorld::updateRoom() {
+void HelloWorld::updateRoom(Label* _playerAtk, Label* _pokeAtk) {
     player.changeCanMove();
     m_mapHandler.updateDoors(player.getPlayerX(), player.getPlayerY());
     player.changeCanMove();
+    if (m_mapHandler.roomHasMonster(player.getPlayerX(), player.getPlayerY()))
+    {
+        auto poke = m_mapHandler.getMonster(player.getPlayerX(), player.getPlayerY());
+        pokemon.setName(poke->getName());
+        _pokemon->setTexture("pokemon/enemy.png");
+        _pokemon->setTextureRect(pokemon.getTextureRect());
+        pokemon.setLife(poke->getLife());
+        pokeLife->setLife(pokemon.getLife());
+        pokemon.setDamage(poke->getDamage());
+        _pokeAtk->setString(to_string(poke->getDamage()));
+        _pokemon->setVisible(true);
+    }
+    else {
+        _pokemon->setVisible(false);
+    }
+    if (m_mapHandler.roomHasTreasure(player.getPlayerX(), player.getPlayerY()))
+    {
+        auto pb = m_mapHandler.getTreasure(player.getPlayerX(), player.getPlayerY());
+        pokeball.setGold(pb->getGoldNumber());
+        pokeball.setOpen(pb->isOpen());
+        if (pokeball.isOpen())
+        {
+            _pb->setTexture("player/pokeball.png");
+            _pb->setTextureRect(Rect(32, 0, 16, 24));
+        }
+        else {
+            _pb->setTexture("player/pokeball.png");
+            _pb->setTextureRect(Rect(0, 0, 16, 24));
+        }
+        _pb->setVisible(true);
+    }
+    else {
+        _pb->setVisible(false);
+    }
+    if (m_mapHandler.roomHasWeapon(player.getPlayerX(), player.getPlayerY()))
+    {
+        log("OOOOOOO");
+    }
+    if (m_mapHandler.roomHasWeapon(player.getPlayerX(), player.getPlayerY()) && !m_mapHandler.getWeapon(player.getPlayerX(), player.getPlayerY())->isTake())
+    {
+        auto wp = m_mapHandler.getWeapon(player.getPlayerX(), player.getPlayerY());
+        weapon.setName(wp->getName());
+        weapon.setDammage(wp->getDammage());
+        _weapon->setTexture("pokemon/carapuce.png");
+        _weapon->setTextureRect(weapon.getTextureRect());
+        _weapon->setVisible(true);
+    }
+    else {
+        _pb->setVisible(false);
+    }
 }
