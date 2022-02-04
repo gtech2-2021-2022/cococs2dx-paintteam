@@ -41,7 +41,9 @@ Size HelloWorld::setTileMap() {
 
     m_tileMap = CCTMXTiledMap::create("Texture/TestRoom.tmx");
     m_collisions = m_tileMap->layerNamed("Collisions");
+    m_doorsLayer = m_tileMap->layerNamed("Doors");
     m_collisions->setVisible(false);
+    m_doorsLayer->setVisible(false);
     /*
     All layers with != y level 
     DoorsOrigin 8
@@ -71,8 +73,12 @@ Size HelloWorld::setTileMap() {
     }
     
     m_tileMap->setScale(m_mapRatio);
+    m_mapHandler.setDoors(m_tileMap);
+    m_mapHandler.updateDoors(player.getPlayerX(), player.getPlayerY());
     return followSize;
 }
+
+
 
 Vec2 HelloWorld::getTileNumber(Vec2 coords) {
     Vec2 tileSize = m_tileMap->getTileSize() * m_mapRatio;
@@ -149,6 +155,29 @@ bool HelloWorld::init()
 
     //Add map
     Size const followSize = setTileMap();
+    
+    MenuItemImage* backMapButton = MenuItemImage::create("mapBackButton.png", "mapBackButton.png",
+        [=](Ref*) {
+            makeMapDissapear();
+        }
+        );
+    if (backMapButton == nullptr || backMapButton->getContentSize().width <= 0 || backMapButton->getContentSize().height <= 0) {
+        Utils::problemLoading("'map.png'");
+    }
+    backMapButton->setName("mapButton");
+    auto bMB = Menu::create(backMapButton, NULL);
+    bMB->setName("mapMenuButton");
+    this->addChild(bMB);
+    backMapButton->setAnchorPoint(Vec2::ZERO);
+    bMB->setPosition(origin);
+    backMapButton->setScale((visibleSize.width > visibleSize.height) ? visibleSize.width / backMapButton->getContentSize().width : visibleSize.width / backMapButton->getContentSize().height);
+    backMapButton->setVisible(false);
+
+    m_mapHandler.setBackMapSprite();
+    m_mapDraw = m_mapHandler.getBackMapSprite();
+    this->addChild(m_mapDraw);
+    m_mapHandler.setDrawnMapSprites(visibleSize);
+    m_mapDraw->setVisible(false);
     
 
     //Add character
@@ -267,23 +296,34 @@ bool HelloWorld::init()
     m_intermediateNode->addChild(pick, 1);
     
     //Add MapButton
-    auto mapButton = MenuItemImage::create("map.png", "map.png",
+    auto mapButton = MenuItemImage::create("map.png", "mapSelected.png",
         [=](Ref*) {
-    
+            makeMapAppear();
         });
     if (mapButton == nullptr || mapButton->getContentSize().width <= 0 || mapButton->getContentSize().height <= 0) {
         Utils::problemLoading("'map.png'");
     }
     auto mapB = Menu::create(mapButton, NULL);
-    mapB->setPosition(Vec2(visibleSize.width - (mapB->getContentSize().width/20), visibleSize.height - (mapB->getContentSize().height /20)));
-    mapB->setScale(m_mapButtonRatio);
+    mapB->setPosition(origin);
+    mapButton->setPosition(Vec2(visibleSize.width - (mapButton->getContentSize().width), visibleSize.height - (mapButton->getContentSize().height)));
+    mapB->setScale(m_mapRatio*2);
     mapB->setVisible(true);
-    m_intermediateNode->addChild(mapB, 1);
+    mapB->setName("openMapButton");
+    this->addChild(mapB, 1);
 
     //Move character on click
     auto listener = EventListenerTouchOneByOne::create();
     const int movementTag = 1; // constexpr
     listener->onTouchBegan = [=](Touch* touch, Event* event) {
+        if (isOnDoorTile(touch->getLocation() + offSetScreen(_player->getPosition())) && isOnDoorTile(_player->getPosition()) && player.canMove()) {
+            log("both on tile");
+            if (changeRoom(touch->getLocation() + offSetScreen(_player->getPosition()))) {
+                log("Changed room");
+                updateRoom();
+                return true;
+            }
+        }
+        
         fight->setVisible(false);
         pick->setVisible(false);
         Vec2 const pos = touch->getLocation() + offSetScreen(_player->getPosition());
@@ -416,4 +456,112 @@ void HelloWorld::pickPockeball(Sprite* _pb, Size _size, Vec2 _origin) {
         Sequence* getPKD = Sequence::create({ open, timer1, show, timer2, hide });
         runAction(getPKD);
     }
+}
+
+void HelloWorld::makeMapAppear() {
+    m_mapDraw->removeAllChildren();
+    m_mapHandler.createMapAndDraw(player.getPlayerX(), player.getPlayerY()); 
+    Node* _button = this->getChildByName("mapMenuButton")->getChildByName("mapButton");
+    m_mapDraw->setVisible(true);
+    _button->setVisible(true);
+    FadeIn* fadeInAction = FadeIn::create(0.75f);
+    m_mapDraw->runAction(fadeInAction);
+    _button->runAction(fadeInAction);
+    
+    MenuItemImage* closeBtn = MenuItemImage::create("pokeCloseNormal.png", "pokeCloseSelected.png",
+        [=](Ref*) {
+            makeMapDissapear();
+        }
+    );
+    if (closeBtn == nullptr || closeBtn->getContentSize().width <= 0 || closeBtn->getContentSize().height <= 0) {
+        Utils::problemLoading("'pokeCloseNormal.png'");
+    }
+    closeBtn->setName("mapButton");
+    auto cBtn = Menu::create(closeBtn, NULL);
+    cBtn->setName("mapMenuButton");
+    m_mapDraw->addChild(cBtn);
+    closeBtn->setAnchorPoint(Vec2::ZERO);
+    closeBtn->setZOrder(3);
+    closeBtn->setScale(m_mapDraw->getContentSize().width * m_mapDraw->getScale() * 0.10f / closeBtn->getContentSize().width);
+    closeBtn->setPosition(Vec2(closeBtn->getContentSize().width * closeBtn->getScale(), m_mapDraw->getContentSize().height * m_mapDraw->getScale()/3));
+    
+
+
+    Node* _openButton = this->getChildByName("openMapButton");
+    _openButton->setVisible(false);
+}
+
+void HelloWorld::makeMapDissapear() {
+    Node* _openButton = this->getChildByName("openMapButton");
+    
+
+    Node* _button = this->getChildByName("mapMenuButton")->getChildByName("mapButton");
+    auto disappear = [=]() {
+        _button->setVisible(false);
+        m_mapDraw->setVisible(false);
+        _openButton->setVisible(true);
+    };
+
+    CallFunc* GoodByeMap = CallFunc::create(disappear);
+    FadeOut* fadeAction = FadeOut::create(0.75f);
+    Sequence* FadeAndDisappear = Sequence::create({ fadeAction, GoodByeMap });
+    m_mapDraw->runAction(FadeAndDisappear);
+    _button->runAction(FadeAndDisappear);
+    
+}
+
+bool HelloWorld::isOnDoorTile(Vec2 position) {
+    Vec2 tileCoord = getTileNumber(position);
+    Sprite* tileSprite = m_doorsLayer->getTileAt(tileCoord);
+    return tileSprite != nullptr;
+}
+
+
+bool HelloWorld::changeRoom(Vec2 pos) {
+    Vec2 middle = m_tileMap->getContentSize()/2.f * m_mapRatio;
+    setPlayerDirection(fmod(Vec2(middle.x - pos.x, middle.y - pos.y).getAngle() * 180 / PI + 180, 360));
+    int direction = player.getDirection();
+    
+    switch (direction)
+    {
+    case Direction::UP:
+        log("up");
+        if (m_mapHandler.roomYXHasNorthLink(player.getPlayerX(), player.getPlayerY())) {
+            player.setPlayerY(player.getPlayerY() - 1);
+            return true;
+        }
+        break;
+    case Direction::DOWN:
+        log("down");
+        if (m_mapHandler.roomYXHasSouthLink(player.getPlayerX(), player.getPlayerY())) {
+            player.setPlayerY(player.getPlayerY() + 1);
+            return true;
+        }
+        break;
+    case Direction::LEFT:
+        log("left");
+        if (m_mapHandler.roomYXHasWestLink(player.getPlayerX(), player.getPlayerY())) {
+            player.setPlayerX(player.getPlayerX() - 1);
+            
+            return true;
+        }
+        break;
+    case Direction::RIGHT:
+        log("right");
+        if (m_mapHandler.roomYXHasEastLink(player.getPlayerX(), player.getPlayerY())) {
+            player.setPlayerX(player.getPlayerX() + 1);
+            return true;
+        }
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
+
+void HelloWorld::updateRoom() {
+    player.changeCanMove();
+    m_mapHandler.updateDoors(player.getPlayerX(), player.getPlayerY());
+    player.changeCanMove();
 }

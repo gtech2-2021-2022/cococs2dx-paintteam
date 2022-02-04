@@ -42,7 +42,6 @@
     <ClCompile Include="..\Classes\MainMenuScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="MasterRoom.cpp" />
     <ClCompile Include="..\Classes\lifebar.cpp">
       <Filter>src\source</Filter>
     </ClCompile>
@@ -75,7 +74,6 @@
     <ClInclude Include="..\Classes\MainMenuScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="MasterRoom.h" />
     <ClInclude Include="..\Classes\lifebar.h">
       <Filter>src\header</Filter>
     </ClInclude>

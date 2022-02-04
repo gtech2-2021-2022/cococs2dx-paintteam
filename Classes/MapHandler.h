@@ -5,6 +5,8 @@
 #include <vector>
 #include "entities.h"
 #include "item.h"
+#include "cocos2d.h"
+#include "Utils.h"
 
 class Player;
 
@@ -42,6 +44,8 @@ public:
 	bool hasLegging() { return legging != nullptr; }
 	bool hasBoots() { return boots != nullptr; }
 	bool hasMonster() { return monster != nullptr; }
+	bool hasBeenVisited() { return m_hasBeenVisited; }
+	void isVisited() { m_hasBeenVisited = true; }
 	void generateTreasure();
 	int getTreasureGold();
 	void takeTreasure(Player &player);
@@ -60,6 +64,7 @@ public:
 	void deleteMonster();
 	Monster* getMonster() { return monster;  };
 
+
 protected:
 	Exist exist;
 	Room* north = nullptr;
@@ -73,23 +78,71 @@ protected:
 	Armor* chestplate = nullptr;
 	Armor* legging = nullptr;
 	Armor* boots = nullptr;
+	bool m_hasBeenVisited = false;
 	
 };
 
 
 class MapHandler
 {
-public:
-	const int size = 5;
-	MapHandler();
-	Room& getRoom(int y, int x) { return _room[y][x]; };
-	int getPlayerY() { return playerY; };
-	int getPlayerX() { return playerX; };
-	bool win();
+
 protected:
 	std::vector<std::vector<Room>> _room;
 	std::vector<Weapon> _weapons;
 	std::vector<Armor> _armors;
 	int playerY;
 	int playerX;
+	cocos2d::Sprite* m_sprite;
+
+	struct element {
+		Utils::ElementDetails player;
+		Utils::ElementDetails enemy;
+		Utils::ElementDetails unvisited;
+		Utils::ElementDetails visited;
+		Utils::ElementDetails vertical;
+		Utils::ElementDetails horizontal;
+	};
+	element m_elements;
+
+	struct door {
+		cocos2d::Sprite* top;
+		cocos2d::Sprite* left;
+		cocos2d::Sprite* right;
+		cocos2d::Sprite* bottom;
+	};
+	door m_doors;
+
+	float m_backRatio = 1;
+	float m_elementRatio = 1;
+
+public:
+	const int size = 5;
+	MapHandler();
+	Room& getRoom(int y, int x) { return _room[y][x]; };
+	int getPlayerY() { return playerY; };
+	int getPlayerX() { return playerX; };
+	const int getSize() { return size; };
+	bool win();
+	void setBackMapSprite() { m_sprite = Utils::createSprite("mapBackground.png"); };
+	cocos2d::Sprite* getBackMapSprite() { return m_sprite; };
+	void createMapAndDraw(int xpos, int ypos);
+	void setDrawnMapSprites(cocos2d::Size screenSize);
+
+	bool roomYXHasNorthLink(int x, int y) {
+		return _room[y][x].hasNorthLink();
+	}
+	bool roomYXHasSouthLink(int x, int y) {
+		return _room[y][x].hasSouthLink();
+	}
+	bool roomYXHasEastLink(int x, int y) {
+		return _room[y][x].hasEastLink();
+	}
+	bool roomYXHasWestLink(int x, int y) {
+		return _room[y][x].hasWestLink();
+	}
+
+	void setDoors(cocos2d::CCTMXTiledMap* parent);
+	cocos2d::Sprite* setDoorSprite(cocos2d::CCTMXTiledMap* parent, cocos2d::Rect imageRescale);
+	void placeDoors(cocos2d::CCTMXTiledMap* map);
+	void updateDoors(int xpos, int ypos);
 };
