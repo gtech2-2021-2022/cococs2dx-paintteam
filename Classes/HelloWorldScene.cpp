@@ -519,7 +519,7 @@ bool HelloWorld::isOnDoorTile(Vec2 position) {
 
 bool HelloWorld::changeRoom(Vec2 pos) {
     Vec2 middle = m_tileMap->getContentSize()/2.f * m_mapRatio;
-    setPlayerDirection(fmod(Vec2(middle.x - pos.x, middle.y - pos.y).getAngle() * 180 / PI + 180, 360));
+    setDirection(fmod(Vec2(middle.x - pos.x, middle.y - pos.y).getAngle() * 180 / PI + 180, 360));
     int direction = player.getDirection();
     
     switch (direction)
