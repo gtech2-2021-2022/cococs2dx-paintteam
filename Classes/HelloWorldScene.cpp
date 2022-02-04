@@ -162,7 +162,7 @@ bool HelloWorld::init()
         }
         );
     if (backMapButton == nullptr || backMapButton->getContentSize().width <= 0 || backMapButton->getContentSize().height <= 0) {
-        Utils::problemLoading("'map.png'");
+        Utils::problemLoading("'mapBackButton.png'");
     }
     backMapButton->setName("mapButton");
     auto bMB = Menu::create(backMapButton, NULL);
@@ -304,9 +304,11 @@ bool HelloWorld::init()
         Utils::problemLoading("'map.png'");
     }
     auto mapB = Menu::create(mapButton, NULL);
-    mapB->setPosition(origin);
-    mapButton->setPosition(Vec2(visibleSize.width - (mapButton->getContentSize().width), visibleSize.height - (mapButton->getContentSize().height)));
-    mapB->setScale(m_mapRatio*2);
+    
+    // mapButton->setPosition(Vec2(visibleSize.width - (mapButton->getContentSize().width)*2, visibleSize.height - (mapButton->getContentSize().height)*2));
+    // mapB->setScale(m_mapRatio*2);
+    mapButton->setPosition({ 600, 375 });
+    log("visible : x %f, y %f ;", visibleSize.width, visibleSize.height);
     mapB->setVisible(true);
     mapB->setName("openMapButton");
     this->addChild(mapB, 1);

@@ -103,8 +103,9 @@ void MapHandler::createMapAndDraw(int xpos, int ypos) {
 	*/
 
 	//calculate an offset rect where the 
-	Vec2 offset = m_sprite->getContentSize() * m_backRatio * 0.15f;
-	Size offsetSize = m_sprite->getContentSize() * m_backRatio * 0.85f;
+	Vec2 offset = m_sprite->getContentSize() * m_backRatio * 0.05f;
+	// Vec2 offset = Vec2::ZERO;
+	Size offsetSize = m_sprite->getContentSize() * 0.85f;
 	int tag = 0;
 	for (int y = 0; y < size; y++)
 	{
@@ -159,11 +160,11 @@ void MapHandler::setDrawnMapSprites(Size screenSize) {
 	screenSize.width *= 0.95f, screenSize.height *= 0.95f;
 	if (screenSize.width > screenSize.height) {
 		m_backRatio = screenSize.height / m_sprite->getContentSize().height;
-		m_elementRatio = (m_sprite->getContentSize().height * m_backRatio * 0.9f / size) / 30; // 0.9 for 10% of margin, 30 because room size is 15 + path size 15
+		m_elementRatio = (m_sprite->getContentSize().height * m_backRatio * 0.9f / (size * 2)) / 30; // 0.9 for 10% of margin, 30 because room size is 15 + path size 15
 	}
 	else {
 		m_backRatio = screenSize.width / m_sprite->getContentSize().width;
-		m_elementRatio = (m_sprite->getContentSize().width * m_backRatio * 0.9f / size) / 30;
+		m_elementRatio = (m_sprite->getContentSize().width * m_backRatio * 0.9f / (size * 2)) / 30;
 	}
 	m_sprite->setScale(m_backRatio);
 	m_sprite->setAnchorPoint({ 0, 0 });
